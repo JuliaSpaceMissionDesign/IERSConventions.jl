@@ -4,7 +4,7 @@ module IERS
 
     using PrecompileTools
     using ReferenceFrameRotations
-    using StaticArraysCore
+    using StaticArrays
 
     # Basic definitions
     include("conventions.jl")

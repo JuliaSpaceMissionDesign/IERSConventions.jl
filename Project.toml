@@ -6,11 +6,11 @@ version = "1.0.0"
 [deps]
 PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 ReferenceFrameRotations = "74f56ac7-18b3-5285-802d-d4bd4f104033"
-StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Tempo = "c33777b2-e695-4fae-9135-aeae8855dd81"
 
 [compat]
 PrecompileTools = "1"
-StaticArraysCore = "1.4"
+StaticArrays = "1"
 Tempo = "1.2"
 julia = "1.8"
