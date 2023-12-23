@@ -26,5 +26,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JuliaSpaceMissionDesign/FrameTransformations.jl", branch="gh-pages"
+    repo="github.com/JuliaSpaceMissionDesign/IERS.jl", branch="gh-pages"
 )
