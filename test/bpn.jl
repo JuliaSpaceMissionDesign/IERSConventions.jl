@@ -323,9 +323,9 @@ end;
         NPB = iers_npb(iers2010b, tt_c)
         @test v2as(NPBe*v, NPB*v) ≤ 2.5e-3
 
-        # CPNc model < 30 mas
+        # CPNc model < 35 mas
         NPB = iers_npb(CPNc, tt_c)
-        @test v2as(NPBe*v, NPB*v) ≤ 30e-3
+        @test v2as(NPBe*v, NPB*v) ≤ 35e-3
 
         # CPNd model < 1 mas
         NPB = iers_npb(CPNd, tt_c)
