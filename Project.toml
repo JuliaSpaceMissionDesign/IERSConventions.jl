@@ -1,0 +1,12 @@
+name = "IERS"
+uuid = "4e86e20e-879b-40dc-9e12-cee74f4cd199"
+authors = ["JSMD Team"]
+version = "1.0.0"
+
+[deps]
+
+[compat]
+
+[extras]
+
+[targets]
