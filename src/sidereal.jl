@@ -26,7 +26,7 @@ function iers_gmst(m::IERSConventions, t::Number)
     ut1 = t*Tempo.CENTURY2DAY + offset_tt2ut1(t*Tempo.CENTURY2SEC)/Tempo.DAY2SEC
 
     # Compute the Earth Rotation Angle 
-    θ = orient_era(m, ut1)
+    θ = iers_era(m, ut1)
 
     # Compute GMST 
     return iers_gmst(m, t, θ)
@@ -35,7 +35,7 @@ end
 
 
 """
-    orient_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
+    iers_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
 
 Compute the Greenwich Apparent Sidereal Time (GAST), in radians, following the IERS 
 Conventions `m` at time `t` expressed as `TT` Julian centuries since J2000. An optional EOP 
@@ -53,10 +53,10 @@ of the equation of the equinoxes.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_gmst`](@ref), [`equation_equinoxes`](@ref) and [`orient_era`](@ref).
+See also [`iers_gmst`](@ref), [`equation_equinoxes`](@ref) and [`iers_era`](@ref).
 """
-function orient_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
-    return orient_gmst(m, t) + equation_equinoxes(m, t, δΔψ)
+function iers_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
+    return iers_gmst(m, t) + equation_equinoxes(m, t, δΔψ)
 end
 
 
@@ -77,13 +77,13 @@ the nutation in longitude can be passed via `δΔψ`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_obliquity`](@ref), [`orient_nutation_comp`](@ref) and [`eeq_complementary`](@ref).
+See also [`iers_obliquity`](@ref), [`iers_nutation_comp`](@ref) and [`eeq_complementary`](@ref).
 """
 function equation_equinoxes(m::IERSConventions, t::Number, δΔψ::Number=0)
 
     # Retrive the mean obliquity and the nutation in longitude 
-    ϵₐ = orient_obliquity(m, t)
-    Δψ, _ = orient_nutation_comp(m, t) 
+    ϵₐ = iers_obliquity(m, t)
+    Δψ, _ = iers_nutation_comp(m, t) 
 
     return (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, t)
 

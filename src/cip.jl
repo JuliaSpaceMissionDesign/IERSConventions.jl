@@ -1,8 +1,8 @@
 
-export orient_cip_motion, cip_xy, cip_xys, cip_vector
+export iers_cip_motion, cip_xy, cip_xys, cip_vector
 
 """
-    orient_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+    iers_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
 
 Compute the GCRF-to-CIRF rotation matrix, following the IERS Conventions `m`, at time `t` 
 expressed in `TT` Julian centuries since J2000. Optional IERS EOP corrections for free-core 
@@ -14,7 +14,7 @@ nutation and time dependent effects can be provided via `δX` and `δY`
 ### See also 
 See also [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
-function orient_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+function iers_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
 
     # Compute CIP coordinates 
     X, Y, s = cip_xys(m, t, δX, δY)
@@ -44,7 +44,7 @@ time `t`, expressed in `TT` Julian centuries since J2000.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_cip_motion`](@ref) and [`cip_xys`](@ref).
+See also [`iers_cip_motion`](@ref) and [`cip_xys`](@ref).
 """
 cip_xy
 
@@ -68,7 +68,7 @@ nutation corrections can be provided via the `δX` and `δY` parameters.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_cip_motion`](@ref) and [`cip_xy`](@ref).
+See also [`iers_cip_motion`](@ref) and [`cip_xy`](@ref).
 """
 function cip_xys(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
 
@@ -119,7 +119,7 @@ expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` an
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_cip_motion`](@ref), [`cip_xy`](@ref) and [`cip_xys`](@ref).
+See also [`iers_cip_motion`](@ref), [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
 function cio_locator(m::IERSConventions, t, x, y)
     _cio_locator(m, t, DelaunayArgs(m, t), PlanetaryArgs(m, t)) - x*y/2
@@ -141,7 +141,7 @@ function cip_xy(m::IERS1996, t::Number)
     yp = arcsec2rad(@evalpoly(t, -0.00013, 0, -22.40992, 0.001836, 0.0011130))
 
     # Compute mean obliquity at reference epoch 
-    ϵ₀ = orient_obliquity(m, 0)
+    ϵ₀ = iers_obliquity(m, 0)
 
     sΩ, cΩ = sincos(d.Ω) 
     sA, cA = sincos(2*(d.F - d.D + d.Ω))
@@ -181,7 +181,7 @@ build_series(
 
 function cip_xy(m::IERS2003, t::Number)
     # Extracted from the IAU-2000 bias-precession-nutation matrix 
-    return npb2xy(orient_npb(m, t))
+    return npb2xy(iers_npb(m, t))
 end
 
 include("constants/cio2000.jl")
@@ -197,7 +197,7 @@ function cip_xy(m::IERS2010, t::Number)
     γ, ϕ, ψ, ϵ = fw_angles(m, t)
 
     # Compute the IAU 2000 nutation components 
-    Δψ, Δϵ = orient_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, t)
 
     # Retrieve the CIP coordinates by applying IAU-2006 compatible nutations 
     return fw2xy(γ, ϕ, ψ + Δψ, ϵ + Δϵ)

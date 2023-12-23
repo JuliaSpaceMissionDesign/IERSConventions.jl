@@ -72,7 +72,7 @@ Group on Precession and the Ecliptic.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_precession`](@ref) and [`precession_angles_rot4`](@ref)
+See also [`iers_precession`](@ref) and [`precession_angles_rot4`](@ref)
 """
 precession_angles_rot3
 
@@ -94,7 +94,7 @@ centuries since `J2000` required for the canonical 4-rotations precession series
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_precession`](@ref) and [`precession_angles_rot4`](@ref)
+See also [`iers_precession`](@ref) and [`precession_angles_rot4`](@ref)
 """
 precession_angles_rot4
 
@@ -102,7 +102,7 @@ precession_angles_rot4
 # 1996 CONVENTIONS
 # ============================
 
-function orient_precession(m::IERS1996, t::Number)
+function iers_precession(m::IERS1996, t::Number)
 
     # Compute the precession angles 
     zₐ, θₐ, ζₐ = precession_angles_rot3(m, t)
@@ -124,7 +124,7 @@ end
 
 function precession_angles_rot4(m::IERS1996, t::Number)
 
-    ϵ₀ = orient_obliquity(m, 0)
+    ϵ₀ = iers_obliquity(m, 0)
     ωₐ = ϵ₀ + arcsec2rad(@evalpoly(t, 0, 0, 0.05127, -0.007726))
 
     ψₐ = arcsec2rad(@evalpoly(t, 0, 5038.7784, -1.07259, -0.001147))
@@ -158,7 +158,7 @@ end
 
 function precession_angles_rot4(m::IERS2003, t::Number)
 
-    ϵ₀ = orient_obliquity(m, 0)
+    ϵ₀ = iers_obliquity(m, 0)
     ωₐ = ϵ₀ + arcsec2rad(@evalpoly(t, 0, -0.02524, 0.05127, -0.007726))
 
     ψₐ = arcsec2rad(@evalpoly(t, 0, 5038.47875, -1.07259, -0.001147))
@@ -194,7 +194,7 @@ end
 function precession_angles_rot4(m::IERS2010, t::Number)
     
     # This is the so-called P03 model!
-    ϵ₀ = orient_obliquity(m, 0)
+    ϵ₀ = iers_obliquity(m, 0)
 
     ωₐ = ϵ₀ + arcsec2rad(
         @evalpoly(t, 0, -0.025754, 0.0512623, -0.00772503, -0.000000467, 0.0000003337)

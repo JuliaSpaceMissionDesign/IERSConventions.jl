@@ -1,9 +1,9 @@
 
-export orient_nutation, orient_nutation_comp
+export iers_nutation, iers_nutation_comp
 
 
 """
-    orient_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+    iers_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
 Compute the nutation matrix that rotates a vector from Mean-of-Date (MOD) to True-of-Date 
 (TOD) axes following the IERS convention `m`, at time `t` expressed in `TT` Julian 
@@ -16,15 +16,15 @@ Optional EOP nutation corrections can be provided via the `δΔψ` and `δΔϵ` 
   IAU 2006 resolutions, [DOI: 10.1051/0004-6361:20065897](https://www.aanda.org/articles/aa/abs/2006/45/aa5897-06/aa5897-06.html) 
 
 ### See also 
-See also [`orient_nutation_comp`](@ref) and [`orient_obliquity`](@ref). 
+See also [`iers_nutation_comp`](@ref) and [`iers_obliquity`](@ref). 
 """
-function orient_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
     
     # Compute mean obliquity at epoch 
-    ϵₐ = orient_obliquity(m, t)
+    ϵₐ = iers_obliquity(m, t)
 
     # Compute nutation in longitude and obliquity 
-    Δψ, Δϵ = orient_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, t)
 
     # Compute nutation matrix with EOP corrections
     return angle_to_dcm(ϵₐ, - (Δψ + δΔψ), - (ϵₐ + Δϵ + δΔϵ), :XZX)
@@ -33,7 +33,7 @@ end
 
 
 """
-    orient_nutation_comp(m::IERSConventions, t::Number)
+    iers_nutation_comp(m::IERSConventions, t::Number)
 
 Compute the nutation components in longitude and obliquity for the IERS convention `m`, in 
 radians, at time `t` expressed in `TT` Julian Centuries since `J2000`.
@@ -69,15 +69,15 @@ radians, at time `t` expressed in `TT` Julian Centuries since `J2000`.
   [nut00b](https://github.com/liberfa/erfa/blob/master/src/nut00b.c) functions 
 
 ### See also 
-See also [`orient_nutation`](@ref)
+See also [`iers_nutation`](@ref)
 """
-orient_nutation_comp
+iers_nutation_comp
 
 
 # 1996 CONVENTIONS
 # ============================
 
-function orient_nutation_comp(m::IERS1996, t::Number)
+function iers_nutation_comp(m::IERS1996, t::Number)
     
     # Compute Delaunay's arguments 
     dargs = DelaunayArgs(m, t)
@@ -98,7 +98,7 @@ build_series(
 # 2003 CONVENTIONS
 # ============================
 
-function orient_nutation_comp(m::IERS2003A, t::Number)
+function iers_nutation_comp(m::IERS2003A, t::Number)
 
     # Compute Delaunay's arguments 
     dargs = DelaunayArgs(m, t)
@@ -112,7 +112,7 @@ function orient_nutation_comp(m::IERS2003A, t::Number)
 
 end
 
-function orient_nutation_comp(m::IERS2003B, t::Number)
+function iers_nutation_comp(m::IERS2003B, t::Number)
 
     # Compute Delaunay's arguments 
     dargs = DelaunayArgs(m, t)
@@ -142,11 +142,11 @@ build_series(
 # 2010 CONVENTIONS
 # ============================
 
-function orient_nutation_comp(::IERS2010A, t::Number)
+function iers_nutation_comp(::IERS2010A, t::Number)
 
     # Computes IAU 2000A nutation components from luni-solar 
     # and planetary terms of the Mathews et al. (2002) series
-    Δψₐ, Δϵₐ = orient_nutation_comp(iers2003a, t)
+    Δψₐ, Δϵₐ = iers_nutation_comp(iers2003a, t)
 
     # Factor correcting the secular variation of J2 
     fj2 = -2.7774e-6 * t # t = TT 
@@ -160,15 +160,15 @@ function orient_nutation_comp(::IERS2010A, t::Number)
 
 end
 
-orient_nutation_comp(::IERS2010B, t) = orient_nutation_comp(iers2003b, t)
+iers_nutation_comp(::IERS2010B, t) = iers_nutation_comp(iers2003b, t)
 
-function orient_nutation_comp(m::CPNC, t::Number)
+function iers_nutation_comp(m::CPNC, t::Number)
 
     # Compute CIP coordinates
     x, y = cip_xy(m, t)
     
     # Compute mean obliquity at epoch 
-    ϵₐ = orient_obliquity(m, t)
+    ϵₐ = iers_obliquity(m, t)
 
     # Compute the precession angles 
     ϵ₀, ψₐ, ωₐ, _ = precession_angles_rot4(m, t)
@@ -191,7 +191,7 @@ function orient_nutation_comp(m::CPNC, t::Number)
 
 end
 
-function orient_nutation_comp(m::CPND, t::Number)
+function iers_nutation_comp(m::CPND, t::Number)
 
     # Compute CIP coordinates 
     x, y = cip_xy(m, t)

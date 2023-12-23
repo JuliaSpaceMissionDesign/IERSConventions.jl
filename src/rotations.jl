@@ -3,7 +3,7 @@
 # ==============================================
 
 """
-    orient_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -14,16 +14,16 @@ the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
     actually computed starting from the MEME2000 rather than the GCRF.  
 
 ### See also 
-See also [`orient_pb`](@ref) and [`orient_rot3_itrf_to_mod`](@ref).
+See also [`iers_pb`](@ref) and [`iers_rot3_itrf_to_mod`](@ref).
 
 """
-function orient_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
-    return orient_pb(m, t/Tempo.CENTURY2SEC)
+function iers_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+    return iers_pb(m, t/Tempo.CENTURY2SEC)
 end
 
 
 """
-    orient_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -38,22 +38,22 @@ the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
     [`iers2010a`](@ref) models. 
 
 ## See also 
-See also [`orient_npb`](@ref) and [`orient_rot3_itrf_to_tod`](@ref).
+See also [`iers_npb`](@ref) and [`iers_rot3_itrf_to_tod`](@ref).
 """
-function orient_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, t)
     δΔϵ = eop_δΔϵ(m, t)
 
     # Compute Nutation-Precession-Bias matrix
-    return orient_npb(m, t/Tempo.CENTURY2SEC, δΔψ, δΔϵ)
+    return iers_npb(m, t/Tempo.CENTURY2SEC, δΔψ, δΔϵ)
 
 end
 
 
 """
-    orient_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -67,16 +67,16 @@ the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2
     [`iers2010a`](@ref) models. 
 
 ## See also 
-See also [`mod_to_gtod3`](@ref) and [`orient_rot3_itrf_to_gtod`](@ref).
+See also [`mod_to_gtod3`](@ref) and [`iers_rot3_itrf_to_gtod`](@ref).
 """
-function orient_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, t)
     δΔϵ = eop_δΔϵ(m, t)
 
     # Retrieve precession-bias matrix
-    PB = orient_pb(m, tt_c)
+    PB = iers_pb(m, tt_c)
 
     # Retrieve MOD-to-GTOD rotation 
     RN = mod_to_gtod3(t, m, δΔψ, δΔϵ)
@@ -86,7 +86,7 @@ end
 
 
 """
-    orient_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
@@ -104,12 +104,12 @@ the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
     between the PEF and GTOD axes. # TODO: specify the magnitude of the rotation!
 
 ## See also 
-See also [`orient_rot3_gcrf_to_gtod`](@ref) and [`orient_rot3_itrf_to_pef`](@ref).
+See also [`iers_rot3_gcrf_to_gtod`](@ref) and [`iers_rot3_itrf_to_pef`](@ref).
 """
-function orient_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
 
     # Compute the GCRF to GTOD rotation matrix
-    RNPB = orient_rot3_gcrf_to_gtod(t, m)
+    RNPB = iers_rot3_gcrf_to_gtod(t, m)
 
     # Compute the TIO locator matrix (from GTOD to PEF)
     sp = tio_locator(m, t/Tempo.CENTURY2SEC)
@@ -126,7 +126,7 @@ end
 # ==============================================
 
 """
-    orient_rot3_itrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_pef(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
@@ -136,9 +136,9 @@ the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
     effects of polar motion. # TODO: specify magnitude!
 
 ## See also 
-See also [`orient_rot3_gcrf_to_pef`](@ref).
+See also [`iers_rot3_gcrf_to_pef`](@ref).
 """
-function orient_rot3_itrf_to_pef(t::Number, ::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_pef(t::Number, ::IERSConventions=iers2010b)
 
     # Retrieve pole coordinates 
     xₚ = eop_xp(m, t)
@@ -150,11 +150,11 @@ function orient_rot3_itrf_to_pef(t::Number, ::IERSConventions=iers2010b)
 
 end
 
-orient_rot3_itrf_to_pef(::Number, ::CPND) = DCM(1I)
+iers_rot3_itrf_to_pef(::Number, ::CPND) = DCM(1I)
 
 
 """
-    orient_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -168,12 +168,12 @@ the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2
     1996 conventions do not account for the TIO locator effects.
 
 ## See also 
-See also [`orient_rot3_itrf_to_pef`](@ref) and [`orient_rot3_gcrf_to_gtod`](@ref).
+See also [`iers_rot3_itrf_to_pef`](@ref) and [`iers_rot3_gcrf_to_gtod`](@ref).
 """
-function orient_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
 
     # Compute ITRF to PEF rotation
-    W  = orient_rot3_itrf_to_pef(t, m)
+    W  = iers_rot3_itrf_to_pef(t, m)
 
     # Compute TIO locator rotation 
     sp = tio_locator(m, t/Tempo.CENTURY2SEC)
@@ -183,7 +183,7 @@ end
 
 
 """
-    orient_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -193,25 +193,25 @@ the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
     [`iers2010a`](@ref) models. 
 
 ## See also 
-See also [`orient_rot3_itrf_to_gtod`](@ref) and [`orient_rot3_gcrf_to_tod`](@ref).
+See also [`iers_rot3_itrf_to_gtod`](@ref) and [`iers_rot3_gcrf_to_tod`](@ref).
 """
-function orient_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
 
     # Compute EOP nutation corrections 
     δΔψ = eop_δΔψ(m, t)
 
     # Compute ITRF to GTOD rotation 
-    W = orient_rot3_itrf_to_gtod(m, t)
+    W = iers_rot3_itrf_to_gtod(m, t)
 
     # Compute GTOD to TOD rotation matrix 
-    R = angle_to_dcm(-orient_gast(m, t/Tempo.CENTURY2SEC, δΔψ), :Z)
+    R = angle_to_dcm(-iers_gast(m, t/Tempo.CENTURY2SEC, δΔψ), :Z)
     return R*W
 
 end
 
 
 """
-    orient_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -221,12 +221,12 @@ the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
     [`iers2010a`](@ref) models. 
 
 ## See also 
-See also [`orient_rot3_itrf_to_tod`](@ref) and [`orient_rot3_gcrf_to_mod`](@ref).
+See also [`iers_rot3_itrf_to_tod`](@ref) and [`iers_rot3_gcrf_to_mod`](@ref).
 """
-function orient_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
 
     # Compute ITRF to GTOD rotation 
-    W = orient_rot3_itrf_to_gtod(m, t)
+    W = iers_rot3_itrf_to_gtod(m, t)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, t)
@@ -243,7 +243,7 @@ end
 # ==============================================
 
 """
-    orient_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Celestial Intermediate Reference Frame (CIRF) at time `t`, expressed in TT seconds 
@@ -257,14 +257,14 @@ since `J2000`, following the IERS Conventions `m`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_rot3_gcrf_to_tirf`](@ref) and [`orient_rot3_gcrf_to_itrf`](@ref).
+See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_gcrf_to_itrf`](@ref).
 """
-function orient_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
-    return orient_cip_motion(m, t/Tempo.CENTURY2SEC, eop_δX(m, t), eop_δY(m, t))
+function iers_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+    return iers_cip_motion(m, t/Tempo.CENTURY2SEC, eop_δX(m, t), eop_δY(m, t))
 end
 
 """
-    orient_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Terrestrial Intermediate Reference Frame (TIRF) at time `t`, expressed in TT seconds 
@@ -278,18 +278,18 @@ since `J2000`, following the IERS Conventions `m`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_rot3_gcrf_to_cirf`](@ref) and [`orient_rot3_gcrf_to_itrf`](@ref).
+See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_gcrf_to_itrf`](@ref).
 """
-function orient_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
 
     # Convert TT seconds to UT1 days since J2000
     ut1_d = (t + offset_tt2ut1(t))/Tempo.DAY2SEC
 
     # Compute GCRF to CIRF rotation (CIP motion)
-    Q = orient_rot3_gcrf_to_cirf(t, m)
+    Q = iers_rot3_gcrf_to_cirf(t, m)
 
     # Compute the ERA rotation matrixes
-    R = orient_era_rotm(m, ut1_d)
+    R = iers_era_rotm(m, ut1_d)
 
     return R*Q
 
@@ -297,7 +297,7 @@ end
 
 
 """
-    orient_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the International Terrestrial Reference Frame (ITRF) at time `t`, expressed in TT seconds 
@@ -314,19 +314,19 @@ since `J2000`, following the IERS Conventions `m`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_rot3_gcrf_to_cirf`](@ref) and [`orient_rot3_gcrf_to_tirf`](@ref).
+See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_gcrf_to_tirf`](@ref).
 """
-function orient_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
 
     # Compute the GCRF to TIRF rotation matrix
-    RQ = orient_rot3_gcrf_to_tirf(t, m)
+    RQ = iers_rot3_gcrf_to_tirf(t, m)
 
     # Retrieve pole coordinates 
     xₚ = eop_xp(m, t)
     yₚ = eop_yp(m, t)
 
     # Compute the polar motion rotation
-    W = orient_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)
+    W = iers_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)
 
     return W*RQ
 
@@ -337,7 +337,7 @@ end
 # ==============================================
 
 """
-    orient_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Terrestrial Intermediate Reference Frame (TIRF) at time `t`, expressed in TT seconds 
@@ -350,24 +350,24 @@ since `J2000`, following the IERS Conventions `m`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_rot3_gcrf_to_tirf`](@ref) and [`orient_rot3_itrf_to_cirf`](@ref).
+See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_itrf_to_cirf`](@ref).
 """
-function orient_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
 
     # Retrieve pole coordinates 
     xₚ = eop_xp(m, t)
     yₚ = eop_yp(m, t)
 
     # Compute the polar motion rotation
-    return orient_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)'
+    return iers_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)'
 
 end
 
-orient_rot3_itrf_to_tirf(::Number, ::CPND) = DCM(1I)
+iers_rot3_itrf_to_tirf(::Number, ::CPND) = DCM(1I)
 
 
 """
-    orient_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Celestial Intermediate Reference Frame (CIRF) at time `t`, expressed in TT seconds 
@@ -380,18 +380,18 @@ since `J2000`, following the IERS Conventions `m`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_rot3_gcrf_to_cirf`](@ref) and [`orient_rot3_itrf_to_tirf`](@ref).
+See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_itrf_to_tirf`](@ref).
 """
-function orient_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
 
     # Convert TT seconds to UT1 days since J2000
     ut1_d = (t + offset_tt2ut1(t))/Tempo.DAY2SEC
 
     # Retrieve polar motion rotation matrix
-    Wt = orient_rot3_itrf_to_tirf(t, m)
+    Wt = iers_rot3_itrf_to_tirf(t, m)
 
     # Compute Earth rotation matrix
-    Rt = orient_era_rotm(m, ut1_d)'
+    Rt = iers_era_rotm(m, ut1_d)'
 
     # Assemble rotation
     return Rt*Wt
@@ -406,7 +406,7 @@ end
 # Low-level function to avoid repeating the same data
 function mod_to_gtod3(t::Number, m::IERSConventions, δΔψ::Number, δΔϵ::Number)
 
-    # Rather than calling the `orient_nutation` function, we manually assembly 
+    # Rather than calling the `iers_nutation` function, we manually assembly 
     # the nutation matrix so that we don't have to compute 
     # the nutation components twice (for N and for GAST)
 
@@ -414,16 +414,16 @@ function mod_to_gtod3(t::Number, m::IERSConventions, δΔψ::Number, δΔϵ::Num
     tt_c = t/Tempo.CENTURY2SEC
 
     # Compute mean obliquity at epoch 
-    ϵₐ = orient_obliquity(m, tt_c)
+    ϵₐ = iers_obliquity(m, tt_c)
 
     # Compute nutation in longitude and obliquity 
-    Δψ, Δϵ = orient_nutation_comp(m, tt_c)
+    Δψ, Δϵ = iers_nutation_comp(m, tt_c)
 
     # Compute nutation matrix with EOP corrections
     N = angle_to_dcm(ϵₐ, - (Δψ + δΔψ), - (ϵₐ + Δϵ + δΔϵ), :XZX)
 
     # Compute Greenwich Mean Sidereal Time 
-    gmst = orient_gmst(m, tt_c)
+    gmst = iers_gmst(m, tt_c)
 
     # Manually compute the equation of the equinoxes
     gast = gmst + (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, tt_c)

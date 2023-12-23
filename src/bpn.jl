@@ -1,8 +1,8 @@
 
-export orient_bias, orient_pb, orient_npb
+export iers_bias, iers_pb, iers_npb
 
 """
-    orient_bias(m::IERSConventions, t::Number)
+    iers_bias(m::IERSConventions, t::Number)
 
 Compute the frame bias matrix, which transform vectors from the GCRF axes to the Mean 
 Equinox and Mean Equator of J2000 (MEME2000) axes. 
@@ -17,13 +17,13 @@ Equinox and Mean Equator of J2000 (MEME2000) axes.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_precession`](@ref), [`orient_pb`](@ref) and [`orient_npb`](@ref).
+See also [`iers_precession`](@ref), [`iers_pb`](@ref) and [`iers_npb`](@ref).
 """
-orient_bias
+iers_bias
 
 
 """
-    orient_pb(m::IERSConventions, t::Number)
+    iers_pb(m::IERSConventions, t::Number)
 
 Compute the precession-bias (PB) matrix, which transforms vectors from the GCRF axes to
 Mean-of-Date (MOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, according 
@@ -37,13 +37,13 @@ to the IERS convention `m`
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_bias`](@ref), [`orient_precession`](@ref) and [`orient_npb`](@ref).
+See also [`iers_bias`](@ref), [`iers_precession`](@ref) and [`iers_npb`](@ref).
 """
-orient_pb
+iers_pb
 
 
 """
-    orient_npb(m::IERSConventions, t::Number, δΔψ=0, δΔϵ=0)
+    iers_npb(m::IERSConventions, t::Number, δΔψ=0, δΔϵ=0)
 
 Compute the nutation-bias-precession (NPB) matrix, which transforms vectors from the GCRF 
 to True-of-Date (TOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, 
@@ -57,23 +57,23 @@ according to the IERS convention `m`
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 
 ### See also 
-See also [`orient_nutation`](@ref), [`orient_precession`](@ref) and [`orient_pb`](@ref).
+See also [`iers_nutation`](@ref), [`iers_precession`](@ref) and [`iers_pb`](@ref).
 """
-orient_npb
+iers_npb
 
 
 # 1996 CONVENTIONS
 # ============================
 
-orient_bias(::IERS1996, ::Number) = DCM(1I)
+iers_bias(::IERS1996, ::Number) = DCM(1I)
 
-orient_pb(m::IERS1996, t::Number) = orient_precession(m, t)
+iers_pb(m::IERS1996, t::Number) = iers_precession(m, t)
 
-function orient_npb(m::IERS1996, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS1996, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Compute precession and nutation matrices
-    rp = orient_precession(m, t)
-    rn = orient_nutation(m, t, δΔψ, δΔϵ)
+    rp = iers_precession(m, t)
+    rn = iers_nutation(m, t, δΔψ, δΔϵ)
 
     # Form Precession-Nutation matrix 
     return rn * rp
@@ -83,12 +83,12 @@ end
 # 2003 CONVENTIONS
 # ============================
 
-function orient_bias(m::IERS2003, ::Number)
+function iers_bias(m::IERS2003, ::Number)
 
     # Compute shift in the origin 
     δα₀ = arcsec2rad(-0.0146)
 
-    ϵ₀ = orient_obliquity(m, 0)
+    ϵ₀ = iers_obliquity(m, 0)
     δψ = arcsec2rad(-0.041775)
 
     # Compute offsets from the ICRS pole
@@ -98,24 +98,24 @@ function orient_bias(m::IERS2003, ::Number)
     return angle_to_dcm(δα₀, ξ₀, -η₀, :ZYX)
 end
 
-function orient_pb(m::IERS2003, t::Number)
+function iers_pb(m::IERS2003, t::Number)
 
     # Compute bias and precession matrices
-    rb = orient_bias(m, t)
-    rp = orient_precession(m, t)
+    rb = iers_bias(m, t)
+    rp = iers_precession(m, t)
 
     # Form Bias-Precession matrix 
     return rp * rb
 end
 
-function orient_npb(m::IERS2003, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS2003, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Compute bias and precession matrices
-    rb = orient_bias(m, t)
-    rp = orient_precession(m, t)
+    rb = iers_bias(m, t)
+    rp = iers_precession(m, t)
 
     # Compute the nutation matrix with added EOP corrections
-    rn = orient_nutation(m, t, δΔψ, δΔϵ)
+    rn = iers_nutation(m, t, δΔψ, δΔϵ)
 
     # Form Bias-Precession matrix 
     return rn * rp * rb
@@ -125,7 +125,7 @@ end
 # 2010 CONVENTIONS
 # ============================
 
-function orient_bias(m::IERS2010, ::Number)
+function iers_bias(m::IERS2010, ::Number)
 
     # Computes Fukushima-Williams angles at J2000
     γ, ϕ, ψ, ϵ = fw_angles(m, 0)
@@ -134,7 +134,7 @@ function orient_bias(m::IERS2010, ::Number)
     return fw_matrix(γ, ϕ, ψ, ϵ)
 end
 
-function orient_pb(m::IERS2010, t::Number)
+function iers_pb(m::IERS2010, t::Number)
 
     # Computes Fukushima-Williams angles at epoch
     γ, ϕ, ψ, ϵ = fw_angles(m, t)
@@ -143,13 +143,13 @@ function orient_pb(m::IERS2010, t::Number)
     return fw_matrix(γ, ϕ, ψ, ϵ)
 end
 
-function orient_npb(m::IERS2010, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS2010, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Computes Fukushima-Williams angles
     γ, ϕ, ψ, ϵ = fw_angles(m, t)
 
     # Computes IAU 2000 nutation components 
-    Δψ, Δϵ = orient_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, t)
 
     # Compute the Bias-precession-nutation matrix by applying 
     # the IAU-2006 compatible nutations with added EOP nutation corrections
