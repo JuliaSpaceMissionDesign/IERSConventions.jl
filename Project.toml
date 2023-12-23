@@ -4,9 +4,13 @@ authors = ["JSMD Team"]
 version = "1.0.0"
 
 [deps]
+PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+ReferenceFrameRotations = "74f56ac7-18b3-5285-802d-d4bd4f104033"
+StaticArraysCore = "1e83bf80-4336-4d27-bf5d-d5a4f845583c"
+Tempo = "c33777b2-e695-4fae-9135-aeae8855dd81"
 
 [compat]
-
-[extras]
-
-[targets]
+PrecompileTools = "1"
+StaticArraysCore = "1.4"
+Tempo = "1.2"
+julia = "1.8"
