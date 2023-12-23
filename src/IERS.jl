@@ -1,7 +1,14 @@
 module IERS
 
+    using Tempo
+
+    using PrecompileTools
+    using ReferenceFrameRotations
+    using StaticArraysCore
+
     # Basic definitions
     include("conventions.jl")
+    include("angles.jl")
     include("poisson.jl")
 
     # Fundamental arguments
