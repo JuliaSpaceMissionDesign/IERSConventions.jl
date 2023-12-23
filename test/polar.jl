@@ -31,5 +31,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
         @test v2as(RPₑ * v, RPₐ * v) ≤ 1e-8
 
+        @test iers_polar_motion(CPNd, rand(), rand(), tt_c) == DCM(1I)
+
     end
 end;
