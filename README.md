@@ -9,7 +9,7 @@ _IERS Conventions made easy._
 [![codecov](https://codecov.io/gh/JuliaSpaceMissionDesign/IERS.jl/branch/main/graph/badge.svg?token=7fj9BjJhKF)](https://codecov.io/gh/JuliaSpaceMissionDesign/IERS.jl)
 [![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
 
-
+The aim of this package is to provide a set of standardised functions that allow the user to easily handle all the computations related to the IERS, from the earlier 1996 up to the latest 2010 conventions.
 
 ## Installation 
 
