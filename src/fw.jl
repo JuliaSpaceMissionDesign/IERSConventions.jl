@@ -32,7 +32,7 @@ function fw_angles(::IERS2010, t::Number)
         )
     )
 
-    ϵ = orient_obliquity(iers2010a, t)
+    ϵ = iers_obliquity(iers2010a, t)
     
     return γ, ϕ, ψ, ϵ
 end
