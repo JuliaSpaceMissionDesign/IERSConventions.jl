@@ -79,7 +79,7 @@ end;
             tt_c = rand() 
             tt_d = tt_c*Tempo.CENTURY2DAY
 
-            v = randn(BigFloat, 3)
+            v = rand(BigFloat, 3)
             v /= norm(v)
 
             # --- Testing IERS 1996 model (< 0.1μas)
@@ -137,7 +137,7 @@ end;
         j == 1 && (tt_c = 1)
         tt_d = tt_c*Tempo.CENTURY2DAY
 
-        v = randn(BigFloat, 3)
+        v = rand(BigFloat, 3)
         v /= norm(v)
 
         # -- Testing 1996 models (< 1 μas)
