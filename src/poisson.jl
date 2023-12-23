@@ -373,7 +373,7 @@ end
 function parse_arguments(n::Int, fcol::Int, match)
 
     # If no arguments have been specified, return an empty vector 
-    fcol < 1 && return @SVector zeros(Int, n)
+    fcol < 1 && return SVector{n}(zeros(Int, n))
 
     # Retrieve the arguments 
     args = match.captures[fcol:fcol + n - 1]
