@@ -11,6 +11,7 @@ Tempo = "c33777b2-e695-4fae-9135-aeae8855dd81"
 
 [compat]
 PrecompileTools = "1"
+ReferenceFrameRotations = "3"
 StaticArrays = "1"
 Tempo = "1.2"
 julia = "1.8"
