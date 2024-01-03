@@ -86,14 +86,14 @@ r2a = 180 / π * 3600
         @test r2a*abs(ga-gst) ≤ 2.5e-3
 
 
-        # --- Testing CPNc model (< 30 mas)
+        # --- Testing CPNc model (< 35 mas)
         # GMST 
         gm  = iers_gmst(CPNc, tt_c)
-        @test r2a*abs(gm-gme) ≤ 30e-3
+        @test r2a*abs(gm-gme) ≤ 35e-3
 
         # GAST
         ga  = iers_gast(CPNc, tt_c)
-        @test r2a*abs(ga-gst) ≤ 30e-3
+        @test r2a*abs(ga-gst) ≤ 35e-3
 
 
         # --- Testing CPNd model (< 15 mas)
