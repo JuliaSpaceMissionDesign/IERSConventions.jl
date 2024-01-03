@@ -4,12 +4,12 @@ export  iers1996,
         iers2003a, iers2003b, 
         iers2010a, iers2010b, CPNc, CPNd
 
-abstract type IERSConventions end 
+abstract type IERSModel end 
 
 # IERS 1996
 # ========================
 
-struct IERS1996 <: IERSConventions end 
+struct IERS1996 <: IERSModel end 
 
 """ 
     iers1996
@@ -22,7 +22,7 @@ const iers1996 = IERS1996()
 # IERS 2003 
 # ========================
 
-abstract type IERS2003 <: IERSConventions end 
+abstract type IERS2003 <: IERSModel end 
 
 struct IERS2003A <: IERS2003 end
 
@@ -46,7 +46,7 @@ const iers2003b = IERS2003B()
 # IERS 2010
 # ========================
 
-abstract type IERS2010 <: IERSConventions end 
+abstract type IERS2010 <: IERSModel end 
 
 struct IERS2010A <: IERS2010 end 
 

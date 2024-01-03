@@ -12,7 +12,7 @@ r2a = 180 / π * 3600
         tt_c = rand()/4
         tt_d = tt_c*Tempo.CENTURY2DAY
 
-        ut1_d = tt_d + IERS.offset_tt2ut1(tt_d*Tempo.DAY2SEC)/Tempo.DAY2SEC
+        ut1_d = tt_d + IERSConventions.offset_tt2ut1(tt_d*Tempo.DAY2SEC)/Tempo.DAY2SEC
 
         # --- Testing 1996 model (< 10 μas)
         # GMST 
@@ -21,7 +21,7 @@ r2a = 180 / π * 3600
         @test r2a*abs(gm-gme) ≤ 1e-5
 
         # Equation of the equinoxes 
-        eeq = IERS.equation_equinoxes(iers1996, tt_c)
+        eeq = IERSConventions.equation_equinoxes(iers1996, tt_c)
         eeqe = eqeq94(DJ2000, tt_d)
         @test r2a*abs(eeq-eeqe) ≤ 1e-7
 
@@ -40,7 +40,7 @@ r2a = 180 / π * 3600
         @test r2a*abs(gm-gme) ≤ 1e-6
 
         # Equation of the equinoxes 
-        eeq = IERS.equation_equinoxes(iers2003a, tt_c)
+        eeq = IERSConventions.equation_equinoxes(iers2003a, tt_c)
         eeqe = ee00a(DJ2000, tt_d)
         @test r2a*abs(eeq-eeqe) ≤ 1e-7
 
@@ -56,7 +56,7 @@ r2a = 180 / π * 3600
         @test r2a*abs(gm-gme) ≤ 1e-6
 
         # Equation of the equinoxes 
-        eeq = IERS.equation_equinoxes(iers2003b, tt_c)
+        eeq = IERSConventions.equation_equinoxes(iers2003b, tt_c)
         @test r2a*abs(eeq-eeqe) ≤ 2.5e-3
 
         # GAST

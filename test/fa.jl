@@ -6,8 +6,8 @@ r2a = 180 / π * 3600
     r2a = 180 / π * 3600
 
     da = [
-        IERS.DelaunayArgs(iers1996, 0.06567),
-        IERS.DelaunayArgs(iers1996, 1.0)
+        IERSConventions.DelaunayArgs(iers1996, 0.06567),
+        IERSConventions.DelaunayArgs(iers1996, 1.0)
     ]
 
     @testset "1996" begin 
@@ -35,7 +35,7 @@ r2a = 180 / π * 3600
     t = [rand(49)..., 1.0]
     @testset "2003/2010 A" begin 
         for i in eachindex(t)
-            da = IERS.DelaunayArgs(rand((iers2003a, iers2010a)), t[i])
+            da = IERSConventions.DelaunayArgs(rand((iers2003a, iers2010a)), t[i])
 
             # --- Delaunay Arguments (accurate to 1μas)
             @test r2a*(abs(da.M - fal03(t[i])))                 ≤ 1e-6
@@ -49,8 +49,8 @@ r2a = 180 / π * 3600
 
     # Testing the truncated expressions of the Delunary Arguments 
     dab = [
-        IERS.DelaunayArgs(rand([iers2003b, iers2010b]), 0.06567),
-        IERS.DelaunayArgs(rand([iers2003b, iers2010b]), 1.0)
+        IERSConventions.DelaunayArgs(rand([iers2003b, iers2010b]), 0.06567),
+        IERSConventions.DelaunayArgs(rand([iers2003b, iers2010b]), 1.0)
     ]
 
     @testset "2003/2010 B" begin
@@ -84,7 +84,7 @@ end;
     t = [rand(49)..., 1.0]
 
     for i in eachindex(t)
-        pa = IERS.PlanetaryArgs(rand((iers2003a, iers2010a)), t[i])
+        pa = IERSConventions.PlanetaryArgs(rand((iers2003a, iers2010a)), t[i])
 
         # --- Planetary Arguments (accurate to 1μas)
         @test r2a*(abs(pa.λ_Me - fame03(t[i]))) ≤ 1e-6
@@ -100,14 +100,14 @@ end;
     end
 
     # Check empty constructor
-    pa = IERS.PlanetaryArgs(iers2003b, rand())
+    pa = IERSConventions.PlanetaryArgs(iers2003b, rand())
     for j in 1:9
         @test getfield(pa, j) == 0
     end
 
     # Check error for 1996 models 
     for fcn in (
-        IERS.pa_mercury, IERS.pa_uranus, IERS.pa_neptune
+        IERSConventions.pa_mercury, IERSConventions.pa_uranus, IERSConventions.pa_neptune
     )
     
         @test_throws ErrorException fcn(iers1996, 0.0)

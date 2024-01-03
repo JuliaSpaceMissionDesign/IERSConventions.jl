@@ -1,4 +1,4 @@
-using Documenter, IERS
+using Documenter, IERSConventions
 using Pkg 
 
 const CI = get(ENV, "CI", "false") == "true"
@@ -6,7 +6,7 @@ const CI = get(ENV, "CI", "false") == "true"
 
 makedocs(;
     authors="Julia Space Mission Design Development Team",
-    sitename="IERS.jl",
+    sitename="IERSConventions.jl",
     modules=[IERS],
     format=Documenter.HTML(; prettyurls=CI, highlights=["yaml"], ansicolor=true),
     pages=[
@@ -26,5 +26,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JuliaSpaceMissionDesign/IERS.jl", branch="gh-pages"
+    repo="github.com/JuliaSpaceMissionDesign/IERSConventions.jl", branch="gh-pages"
 )

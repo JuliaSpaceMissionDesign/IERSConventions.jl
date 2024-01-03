@@ -145,7 +145,7 @@ end;
         v1 = Pe*v; v1 /= norm(v1); 
 
         # Test traditional parameterization
-        zₐ, θₐ, ζₐ = IERS.precession_angles_rot3(iers1996, tt_c)
+        zₐ, θₐ, ζₐ = IERSConventions.precession_angles_rot3(iers1996, tt_c)
         ζe, ze, θe = prec76(DJ2000, 0, DJ2000, tt_d)
         
         @test r2a*abs(zₐ - ze) ≤ 1e-6
@@ -155,7 +155,7 @@ end;
         # Test Capitaine parameterization (since we do not have ERFA expressions 
         # that provide this angles, we check that the resulting precession matrix is 
         # the same as that obtained with the original parameterization)
-        ϵ₀, ψₐ, ωₐ, χₐ = IERS.precession_angles_rot4(iers1996, tt_c)
+        ϵ₀, ψₐ, ωₐ, χₐ = IERSConventions.precession_angles_rot4(iers1996, tt_c)
         P = angle_to_dcm(χₐ, :Z)*angle_to_dcm(ϵ₀, -ψₐ, -ωₐ, :XZX)
 
         # This test is accurate up to 0.1 mas, which is anyway below the precision of 
@@ -173,7 +173,7 @@ end;
         v1 = Pe*v; v1 /= norm(v1); 
 
         # Test traditional parameterization
-        zₐ, θₐ, ζₐ = IERS.precession_angles_rot3(iers2003a, tt_c)
+        zₐ, θₐ, ζₐ = IERSConventions.precession_angles_rot3(iers2003a, tt_c)
         P = angle_to_dcm(-ζₐ, θₐ, -zₐ, :ZYZ)
         @test v2as(v1, P*v) ≤ 1e-6
 
@@ -189,14 +189,14 @@ end;
         ϵe, ψe, ωe, χe, ze, ζe, θe = p06e(DJ2000, tt_d)[[1, 2, 3, 9, 10, 11, 12]]
 
         # Test equatorial precession angles 
-        zₐ, θₐ, ζₐ = IERS.precession_angles_rot3(m, tt_c)
+        zₐ, θₐ, ζₐ = IERSConventions.precession_angles_rot3(m, tt_c)
 
         @test r2a*abs(zₐ - ze) ≤ 1e-6
         @test r2a*abs(θₐ - θe) ≤ 1e-6
         @test r2a*abs(ζₐ - ζe) ≤ 1e-6
         
         # Test canonical 4-rotation precession angles 
-        ϵ₀, ψₐ, ωₐ, χₐ = IERS.precession_angles_rot4(m, tt_c)
+        ϵ₀, ψₐ, ωₐ, χₐ = IERSConventions.precession_angles_rot4(m, tt_c)
 
         @test r2a*abs(ϵ₀ - ϵe) ≤ 1e-6
         @test r2a*abs(ψₐ - ψe) ≤ 1e-6
@@ -224,7 +224,7 @@ end;
         v /= norm(v)
 
         # -- Fukushima-Williams angles (< 0.1 μas)
-        fw = IERS.fw_angles(iers2010a, tt_c)
+        fw = IERSConventions.fw_angles(iers2010a, tt_c)
         fe = pfw06(DJ2000, tt_d)
 
         for j in 1:4
@@ -233,12 +233,12 @@ end;
 
         # -- FW Rotation Matrix (< 0.1 μas)
         Rₑ = fw2m(fe[1], fe[2], fe[3], fe[4])
-        Rₐ = IERS.fw_matrix(fw[1], fw[2], fw[3], fw[4])
+        Rₐ = IERSConventions.fw_matrix(fw[1], fw[2], fw[3], fw[4])
 
         @test v2as(Rₑ * v, Rₐ * v) ≤ 1e-7
 
         # -- FW to (X, Y) CIP coordinates (< 0.1 μas)
-        x, y = IERS.fw2xy(fw[1], fw[2], fw[3], fw[4])
+        x, y = IERSConventions.fw2xy(fw[1], fw[2], fw[3], fw[4])
         xe, ye = ERFA.fw2xy(fe[1], fe[2], fe[3], fe[4])
 
         @test r2a*abs(xe-x) ≤ 1e-7

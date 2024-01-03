@@ -2,7 +2,7 @@
 export iers_gmst, iers_gast
 
 """
-    iers_gmst(m::IERSConventions, t::Number)
+    iers_gmst(m::IERSModel, t::Number)
 
 Compute the Greenwich Mean Sidereal Time (GMST), in radians, following the IERS Conventions 
 `m` at time `t` expressed as `TT` Julian centuries since J2000. 
@@ -20,7 +20,7 @@ Compute the Greenwich Mean Sidereal Time (GMST), in radians, following the IERS 
 ### See also 
 See also [`iers_gast`](@ref) and [`iers_era`](@ref).
 """
-function iers_gmst(m::IERSConventions, t::Number)
+function iers_gmst(m::IERSModel, t::Number)
 
     # Transform from TT centuries to UT1 days
     ut1 = t*Tempo.CENTURY2DAY + offset_tt2ut1(t*Tempo.CENTURY2SEC)/Tempo.DAY2SEC
@@ -35,7 +35,7 @@ end
 
 
 """
-    iers_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
+    iers_gast(m::IERSModel, t::Number, δΔψ::Number=0)
 
 Compute the Greenwich Apparent Sidereal Time (GAST), in radians, following the IERS 
 Conventions `m` at time `t` expressed as `TT` Julian centuries since J2000. An optional EOP 
@@ -55,13 +55,13 @@ of the equation of the equinoxes.
 ### See also 
 See also [`iers_gmst`](@ref), [`equation_equinoxes`](@ref) and [`iers_era`](@ref).
 """
-function iers_gast(m::IERSConventions, t::Number, δΔψ::Number=0)
+function iers_gast(m::IERSModel, t::Number, δΔψ::Number=0)
     return iers_gmst(m, t) + equation_equinoxes(m, t, δΔψ)
 end
 
 
 """
-    equation_equinoxes(m::IERSConventions, t::Number, δΔψ::Number = 0)
+    equation_equinoxes(m::IERSModel, t::Number, δΔψ::Number = 0)
 
 Compute the Equation of the Equinoxes, in radians, according to the IERS Conventions `m`, 
 at time `t` expressed as `TT` Julian centuries since J2000. An optional EOP correction for 
@@ -79,7 +79,7 @@ the nutation in longitude can be passed via `δΔψ`.
 ### See also 
 See also [`iers_obliquity`](@ref), [`iers_nutation_comp`](@ref) and [`eeq_complementary`](@ref).
 """
-function equation_equinoxes(m::IERSConventions, t::Number, δΔψ::Number=0)
+function equation_equinoxes(m::IERSModel, t::Number, δΔψ::Number=0)
 
     # Retrive the mean obliquity and the nutation in longitude 
     ϵₐ = iers_obliquity(m, t)
@@ -91,7 +91,7 @@ end
 
 
 """
-    eeq_complementary(m::IERSConventions, t::Number)
+    eeq_complementary(m::IERSModel, t::Number)
 
 Compute the complementary terms of the equation of the equinoxes, in radians, associated 
 to the IERS Conventions `m`, at time `t` expressed in `TT` Julian centuries since J2000.
@@ -107,7 +107,7 @@ to the IERS Conventions `m`, at time `t` expressed in `TT` Julian centuries sinc
 - IERS Technical Note No. [32](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn32.html)
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 """
-function eeq_complementary(m::IERSConventions, t::Number) 
+function eeq_complementary(m::IERSModel, t::Number) 
     return ee_cpt(m, t, DelaunayArgs(m, t), PlanetaryArgs(m, t))
 end
 
@@ -177,7 +177,7 @@ function iers_gmst(::IERS2003, t::Number, θ::Number)
 end
 
 include("constants/gast2000.jl")
-build_series(:ee_cpt, :IERSConventions, [COEFFS_EEQ2000])
+build_series(:ee_cpt, :IERSModel, [COEFFS_EEQ2000])
 
 
 # 2010 CONVENTIONS

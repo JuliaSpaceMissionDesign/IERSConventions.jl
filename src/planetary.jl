@@ -48,13 +48,13 @@ function PlanetaryArgs(m::IERSAModels, t::Number)
 
 end 
 
-function PlanetaryArgs(::IERSConventions, ::Number)
+function PlanetaryArgs(::IERSModel, ::Number)
     PlanetaryArgs(0, 0, 0, 0, 0, 0, 0, 0, 0)
 end
 
 
 """
-	pa_mercury(m::IERSConventions, t::Number) 
+	pa_mercury(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Mercury in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -67,7 +67,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fame03.c) software library
 """
-function pa_mercury(::IERSConventions, t::Number)
+function pa_mercury(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 4.402608842, 2608.7903141574))
 end
 
@@ -82,7 +82,7 @@ end
 
 
 """
-	pa_venus(m::IERSConventions, t::Number) 
+	pa_venus(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Venus in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -92,7 +92,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fave03.c) software library
 """
-function pa_venus(::IERSConventions, t::Number)
+function pa_venus(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 3.176146697, 1021.3285546211))
 end
 
@@ -102,7 +102,7 @@ end
 
 
 """
-	pa_earth(m::IERSConventions, t::Number) 
+	pa_earth(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Earth in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -112,7 +112,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fae03.c) software library
 """
-function pa_earth(::IERSConventions, t::Number)
+function pa_earth(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 1.753470314, 628.3075849991))
 end
 
@@ -122,7 +122,7 @@ end
 
 
 """
-	pa_mars(m::IERSConventions, t::Number) 
+	pa_mars(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Mars in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -132,7 +132,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fama03.c) software library
 """
-function pa_mars(::IERSConventions, t::Number)
+function pa_mars(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 6.203480913, 334.0612426700))
 end
 
@@ -142,7 +142,7 @@ end
 
 
 """
-	pa_jupiter(m::IERSConventions, t::Number) 
+	pa_jupiter(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Jupiter in radians, at time `t` expressed in `TDB`
 Julian centuries since `J2000`. 
@@ -152,7 +152,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/faju03.c) software library
 """
-function pa_jupiter(::IERSConventions, t::Number)
+function pa_jupiter(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 0.599546497, 52.9690962641))
 end
 
@@ -162,7 +162,7 @@ end
 
 
 """
-	pa_saturn(m::IERSConventions, t::Number) 
+	pa_saturn(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Saturn in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -172,7 +172,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fasa03.c) software library
 """
-function pa_saturn(::IERSConventions, t::Number)
+function pa_saturn(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 0.874016757, 21.3299104960))
 end
 
@@ -182,7 +182,7 @@ end
 
 
 """
-	pa_uranus(m::IERSConventions, t::Number) 
+	pa_uranus(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Uranus in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -195,7 +195,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/faur03.c) software library
 """
-function pa_uranus(::IERSConventions, t::Number)
+function pa_uranus(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 5.481293872, 7.4781598567))
 end
 
@@ -210,7 +210,7 @@ end
 
 
 """
-	pa_neptune(m::IERSConventions, t::Number) 
+	pa_neptune(m::IERSModel, t::Number) 
 
 Return the mean heliocentric longitude of Neptune in radians, at time `t` expressed in `TDB` 
 Julian centuries since `J2000`. 
@@ -223,7 +223,7 @@ Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fane03.c) software library
 """
-function pa_neptune(::IERSConventions, t::Number)
+function pa_neptune(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 5.311886287, 3.8133035638))
 end
 
@@ -238,7 +238,7 @@ end
 
 
 """
-  	pa_precession(m::IERSConventions, t::Number) 
+  	pa_precession(m::IERSModel, t::Number) 
 
 Return the general accumulated precession in longitude `pₐ` in radians, at time `t` 
 expressed in `TDB` Julian centuries since `J2000`. 
@@ -248,7 +248,7 @@ expressed in `TDB` Julian centuries since `J2000`.
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fapa03.c) software library
 """
-function pa_precession(::IERSConventions, t::Number)
+function pa_precession(::IERSModel, t::Number)
     return mod2pi(@evalpoly(t, 0, 0.024381750, 0.00000538691))
 end
 

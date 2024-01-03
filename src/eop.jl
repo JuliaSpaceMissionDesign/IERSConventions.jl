@@ -9,7 +9,7 @@
 # =========================================
 
 """
-    eop_δΔψ(m::IERSConventions, t::Number)
+    eop_δΔψ(m::IERSModel, t::Number)
 
 Interpolate and retrieve the EOP nutation correction in longitude `δΔψ`, in radians, 
 at time `t` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
@@ -24,11 +24,11 @@ function eop_δΔψ(m::IERS1996, t::Number)
     return 0
 end
 
-eop_δΔψ(::IERSConventions, ::Number) = 0
+eop_δΔψ(::IERSModel, ::Number) = 0
 
 
 """
-    eop_δΔϵ(m::IERSConventions, t::Number)
+    eop_δΔϵ(m::IERSModel, t::Number)
 
 Interpolate and retrieve the EOP nutation correction in obliquity `δΔϵ`, in radians, 
 at time `t` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
@@ -43,11 +43,11 @@ function eop_δΔϵ(m::IERS1996, t::Number)
     return 0
 end
 
-eop_δΔϵ(::IERSConventions, ::Number) = 0
+eop_δΔϵ(::IERSModel, ::Number) = 0
 
 
 """
-    eop_δX(m::IERSConventions, t::Number)
+    eop_δX(m::IERSModel, t::Number)
 
 Interpolate and retrieve the CIP `δX` correction, in radians, at time `t` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
@@ -62,11 +62,11 @@ function eop_δX(m::IERS1996, t::Number)
     return 0
 end
 
-eop_δX(::IERSConventions, ::Number) = 0
+eop_δX(::IERSModel, ::Number) = 0
 
 
 """
-    eop_δY(m::IERSConventions, t::Number)
+    eop_δY(m::IERSModel, t::Number)
 
 Interpolate and retrieve the CIP `δY` correction, in radians, at time `t` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
@@ -81,16 +81,16 @@ function eop_δY(m::IERS1996, t::Number)
     return 0
 end
 
-eop_δY(::IERSConventions, ::Number) = 0
+eop_δY(::IERSModel, ::Number) = 0
 
 
 """
-    eop_xp(m::IERSConventions, t::Number)
+    eop_xp(m::IERSModel, t::Number)
 
 Interpolate and retrieve the pole `xₚ` coordinate, in radians, at time `t` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
-function eop_xp(m::IERSConventions, t::Number)
+function eop_xp(m::IERSModel, t::Number)
     # TODO: complete me
     return 0
 end
@@ -99,12 +99,12 @@ eop_xp(::CPND, ::Number) = 0
 
 
 """
-    eop_yp(m::IERSConventions, t::Number)
+    eop_yp(m::IERSModel, t::Number)
 
 Interpolate and retrieve the pole `yₚ` coordinate, in radians, at time `t` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
-function eop_yp(m::IERSConventions, t::Number)
+function eop_yp(m::IERSModel, t::Number)
     # TODO: complete me
     return 0
 end
@@ -140,7 +140,7 @@ end
 # =========================================
 
 # Function to convert nutation corrections to CIP corrections and viceversa
-function δnut_to_δcip(m::IERSConventions, t::Number, δΔψ::Number, δΔϵ::Number)
+function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
     
     # Compute the precession angles 
     ϵ₀, ψₐ, _, χₐ = precession_angles_rot4(m, t)
@@ -159,7 +159,7 @@ function δnut_to_δcip(m::IERSConventions, t::Number, δΔψ::Number, δΔϵ::N
 
 end
 
-function δcip_to_δnut(m::IERSConventions, t::Number, δx::Number, δy::Number)
+function δcip_to_δnut(m::IERSModel, t::Number, δx::Number, δy::Number)
 
     # Compute the precession angles 
     ϵ₀, ψₐ, _, χₐ = precession_angles_rot4(m, t)

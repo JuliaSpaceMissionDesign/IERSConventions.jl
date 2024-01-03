@@ -2,7 +2,7 @@
 export iers_precession
 
 """ 
-    iers_precession(m::IERSConventions, t::Number)
+    iers_precession(m::IERSModel, t::Number)
 
 Return the precession matrix that rotates a vector from MEME2000 axes to Mean of Date (MOD) 
 axes, at time `t` expressed in `TT` Julian centuries since `J2000`, according to the IERS 
@@ -34,7 +34,7 @@ convention `m`.
 ### See also 
 See also [`precession_angles_rot3`](@ref) and [`precession_angles_rot4`](@ref)
 """
-function iers_precession(m::IERSConventions, t::Number)
+function iers_precession(m::IERSModel, t::Number)
 
     # Compute the precession angles 
     ϵ₀, ψₐ, ωₐ, χₐ = precession_angles_rot4(m, t)
@@ -46,7 +46,7 @@ end
 
 
 """ 
-    precession_angles_rot3(m::IERSConventions, t::Number)
+    precession_angles_rot3(m::IERSModel, t::Number)
 
 Return the equatorial precession angles zₐ, θₐ, ζₐ, in radians, at time `t` expressed in 
 `TT` Julian centuries since `J2000` for the 3-rotations precession series initially used 
@@ -79,7 +79,7 @@ precession_angles_rot3
 
 """
 
-    precession_angles_rot4(m::IERSConventions, t::Number)
+    precession_angles_rot4(m::IERSModel, t::Number)
 
 Return the precession angles ϵ₀, ψₐ, ωₐ, χₐ, in radians, at time `t` expressed in `TT` Julian 
 centuries since `J2000` required for the canonical 4-rotations precession series.

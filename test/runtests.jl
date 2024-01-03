@@ -1,5 +1,5 @@
 
-using IERS 
+using IERSConventions
 using Test 
 
 using ERFA 
@@ -7,7 +7,7 @@ using LinearAlgebra
 using ReferenceFrameRotations
 using Tempo
 
-@testset "IERS" verbose=true begin 
+@testset "IERSConventions" verbose=true begin 
     
     include("fa.jl")
     include("bpn.jl")

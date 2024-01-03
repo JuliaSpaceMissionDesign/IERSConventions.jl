@@ -15,13 +15,13 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         v = rand(BigFloat, 3)
 
         # -- Testing TIO Locator 
-        sp = IERS.tio_locator(iers2010a, tt_c) 
+        sp = IERSConventions.tio_locator(iers2010a, tt_c) 
         spₑ = sp00(DJ2000, tt_d) 
 
         @test r2a*abs(sp-spₑ) ≤ 1e-6
 
-        @test IERS.tio_locator(iers1996, tt_c) == 0
-        @test IERS.tio_locator(CPNd, tt_c) == 0
+        @test IERSConventions.tio_locator(iers1996, tt_c) == 0
+        @test IERSConventions.tio_locator(CPNd, tt_c) == 0
 
         # -- Testing Polar Motion 
         xₚ, yₚ = rand(), rand()

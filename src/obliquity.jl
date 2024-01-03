@@ -2,7 +2,7 @@
 export iers_obliquity
 
 """
-    iers_obliquity(m::IERSConventions, t::Number)
+    iers_obliquity(m::IERSModel, t::Number)
 
 Compute the mean obliquity of the ecliptic at epoch, in radians, at time `t` expressed in 
 `TT` Julian centuries since `J2000`, according to the IERS convention `m`.

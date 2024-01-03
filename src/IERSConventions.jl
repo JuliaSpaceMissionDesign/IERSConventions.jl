@@ -1,4 +1,4 @@
-module IERS
+module IERSConventions
 
     using Tempo
 
@@ -7,7 +7,7 @@ module IERS
     using StaticArrays
 
     # Basic definitions
-    include("conventions.jl")
+    include("models.jl")
     include("angles.jl")
     include("poisson.jl")
 

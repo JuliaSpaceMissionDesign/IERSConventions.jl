@@ -2,7 +2,7 @@
 export iers_cip_motion, cip_xy, cip_xys, cip_vector
 
 """
-    iers_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+    iers_cip_motion(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
 
 Compute the GCRF-to-CIRF rotation matrix, following the IERS Conventions `m`, at time `t` 
 expressed in `TT` Julian centuries since J2000. Optional IERS EOP corrections for free-core 
@@ -14,7 +14,7 @@ nutation and time dependent effects can be provided via `δX` and `δY`
 ### See also 
 See also [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
-function iers_cip_motion(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+function iers_cip_motion(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
 
     # Compute CIP coordinates 
     X, Y, s = cip_xys(m, t, δX, δY)
@@ -26,7 +26,7 @@ end
 
 
 """
-    cip_xy(m::IERSConventions, t::Number)
+    cip_xy(m::IERSModel, t::Number)
 
 Compute the CIP X and Y coordinates, in radians, following the IERS Conventions `m`, at 
 time `t`, expressed in `TT` Julian centuries since J2000.
@@ -50,7 +50,7 @@ cip_xy
 
 
 """
-    cip_xys(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+    cip_xys(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
 
 Compute the CIP X, Y and CIO locator s coordinates, in radians, following the IERS 
 conventions `m` at time `t`, expressed in `TT`` Julian centuries since J2000. Optional EOP 
@@ -70,7 +70,7 @@ nutation corrections can be provided via the `δX` and `δY` parameters.
 ### See also 
 See also [`iers_cip_motion`](@ref) and [`cip_xy`](@ref).
 """
-function cip_xys(m::IERSConventions, t::Number, δX::Number=0, δY::Number=0)
+function cip_xys(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
 
     # Compute CIP coordinates 
     x, y = cip_xy(m, t)
@@ -88,7 +88,7 @@ end
 
 
 """
-    cip_vector(m::IERSConventions, t::Number)
+    cip_vector(m::IERSModel, t::Number)
 
 Compute the Celestial Intermediate Pole (CIP) vector, following the IERS Conventions `m` at 
 time `t`, expressed in `TT` Julian centuries since J2000.
@@ -100,14 +100,14 @@ time `t`, expressed in `TT` Julian centuries since J2000.
 ### See also 
 See also [`cip_xy`](@ref).
 """
-function cip_vector(m::IERSConventions, t::Number)
+function cip_vector(m::IERSModel, t::Number)
     xs, ys = cip_xy(m, t)
     return SA[xs, ys, sqrt(1 - xs^2 - ys^2)]
 end
 
 
 """
-    cio_locator(m::IERSConventions, t::Number, x::Number, y::Number)
+    cio_locator(m::IERSModel, t::Number, x::Number, y::Number)
 
 Compute the CIO locator `s`, in radians, following the IERS Conventions `m' at time `t`, 
 expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` and `y`.
@@ -121,7 +121,7 @@ expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` an
 ### See also 
 See also [`iers_cip_motion`](@ref), [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
-function cio_locator(m::IERSConventions, t, x, y)
+function cio_locator(m::IERSModel, t, x, y)
     _cio_locator(m, t, DelaunayArgs(m, t), PlanetaryArgs(m, t)) - x*y/2
 end
 

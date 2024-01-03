@@ -2,7 +2,7 @@
 export iers_bias, iers_pb, iers_npb
 
 """
-    iers_bias(m::IERSConventions, t::Number)
+    iers_bias(m::IERSModel, t::Number)
 
 Compute the frame bias matrix, which transform vectors from the GCRF axes to the Mean 
 Equinox and Mean Equator of J2000 (MEME2000) axes. 
@@ -23,7 +23,7 @@ iers_bias
 
 
 """
-    iers_pb(m::IERSConventions, t::Number)
+    iers_pb(m::IERSModel, t::Number)
 
 Compute the precession-bias (PB) matrix, which transforms vectors from the GCRF axes to
 Mean-of-Date (MOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, according 
@@ -43,7 +43,7 @@ iers_pb
 
 
 """
-    iers_npb(m::IERSConventions, t::Number, δΔψ=0, δΔϵ=0)
+    iers_npb(m::IERSModel, t::Number, δΔψ=0, δΔϵ=0)
 
 Compute the nutation-bias-precession (NPB) matrix, which transforms vectors from the GCRF 
 to True-of-Date (TOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, 

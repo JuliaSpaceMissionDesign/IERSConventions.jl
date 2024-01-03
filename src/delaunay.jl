@@ -28,7 +28,7 @@ struct DelaunayArgs{T}
     Ω::T
 end
 
-function DelaunayArgs(m::IERSConventions, t::Number)
+function DelaunayArgs(m::IERSModel, t::Number)
 
     DelaunayArgs(
         delaunay_anomaly_moon(m, t), 
@@ -42,7 +42,7 @@ end
 
 
 """
-    delaunay_anomaly_moon(m::IERSConventions, t::Number)
+    delaunay_anomaly_moon(m::IERSModel, t::Number)
 
 Compute the mean anomaly of the Moon, in radians, given time `t` expressed in TDB Julian 
 centuries since J2000. 
@@ -56,7 +56,7 @@ function delaunay_anomaly_moon(::IERSAModels, t::Number)
     )
 end
 
-function delaunay_anomaly_moon(::IERSConventions, t::Number)
+function delaunay_anomaly_moon(::IERSModel, t::Number)
     arcsec2rad(mod(485868.249036 + 1717915923.2178t, 1296000))
 end
 
@@ -67,7 +67,7 @@ end
 
 
 """
-    delaunay_anomaly_sun(m::IERSConventions, t::Number)
+    delaunay_anomaly_sun(m::IERSModel, t::Number)
 
 Compute the mean anomaly of the Sun, in radians, given time `t` expressed in TDB Julian 
 centuries since J2000.
@@ -80,7 +80,7 @@ function delaunay_anomaly_sun(::IERSAModels, t::Number)
     )
 end
 
-function delaunay_anomaly_sun(::IERSConventions, t::Number)
+function delaunay_anomaly_sun(::IERSModel, t::Number)
     arcsec2rad(mod(1287104.79305 + 129596581.0481t, 1296000))
 end
 
@@ -91,7 +91,7 @@ end
 
 
 """
-    delaunay_longitude_diff(m::IERSConventions, t::Number)
+    delaunay_longitude_diff(m::IERSModel, t::Number)
 
 Compute the difference between the longitude of the Moon and the longitude of the Moon's 
 node, in radians, given time `t` expressed in TDB Julian centuries since J2000.
@@ -104,7 +104,7 @@ function delaunay_longitude_diff(::IERSAModels, t::Number)
     )
 end
 
-function delaunay_longitude_diff(::IERSConventions, t::Number)
+function delaunay_longitude_diff(::IERSModel, t::Number)
     arcsec2rad(mod(335779.526232 + 1739527262.8478t, 1296000))
 end
 
@@ -114,7 +114,7 @@ function delaunay_longitude_diff(::IERS1996, t::Number)
 end
 
 """
-    delaunay_elongation_moon(m::IERSConventions, t::Number)
+    delaunay_elongation_moon(m::IERSModel, t::Number)
 
 Compute the mean elongation of the Moon from the Sun, in radians, given time `t` expressed in 
 TDB Julian centuries since J2000.
@@ -127,7 +127,7 @@ function delaunay_elongation_moon(::IERSAModels, t::Number)
     )
 end
 
-function delaunay_elongation_moon(::IERSConventions, t::Number)
+function delaunay_elongation_moon(::IERSModel, t::Number)
     arcsec2rad(mod(1072260.70369 + 1602961601.2090t, 1296000))
 end
 
@@ -137,7 +137,7 @@ function delaunay_elongation_moon(::IERS1996, t::Number)
 end
 
 """
-    delaunay_longitude_node(m::IERSConventions, t::Number)
+    delaunay_longitude_node(m::IERSModel, t::Number)
 
 Compute the longitude of the mean ascending node of the lunar orbit on th ecliptic, 
 measured from the mean equinox of date, in radians, given time `t` expressed in TDB Julian 
@@ -151,7 +151,7 @@ function delaunay_longitude_node(::IERSAModels, t::Number)
     )
 end
 
-function delaunay_longitude_node(::IERSConventions, t::Number)
+function delaunay_longitude_node(::IERSModel, t::Number)
     arcsec2rad(mod(450160.398036 - 6962890.5431t, 1296000))
 end
 

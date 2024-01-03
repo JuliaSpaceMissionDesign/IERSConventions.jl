@@ -3,7 +3,7 @@ export iers_nutation, iers_nutation_comp
 
 
 """
-    iers_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+    iers_nutation(m::IERSModel, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
 Compute the nutation matrix that rotates a vector from Mean-of-Date (MOD) to True-of-Date 
 (TOD) axes following the IERS convention `m`, at time `t` expressed in `TT` Julian 
@@ -18,7 +18,7 @@ Optional EOP nutation corrections can be provided via the `δΔψ` and `δΔϵ` 
 ### See also 
 See also [`iers_nutation_comp`](@ref) and [`iers_obliquity`](@ref). 
 """
-function iers_nutation(m::IERSConventions, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_nutation(m::IERSModel, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
     
     # Compute mean obliquity at epoch 
     ϵₐ = iers_obliquity(m, t)
@@ -33,7 +33,7 @@ end
 
 
 """
-    iers_nutation_comp(m::IERSConventions, t::Number)
+    iers_nutation_comp(m::IERSModel, t::Number)
 
 Compute the nutation components in longitude and obliquity for the IERS convention `m`, in 
 radians, at time `t` expressed in `TT` Julian Centuries since `J2000`.

@@ -3,7 +3,7 @@
 # ==============================================
 
 """
-    iers_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_mod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -17,13 +17,13 @@ the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
 See also [`iers_pb`](@ref) and [`iers_rot3_itrf_to_mod`](@ref).
 
 """
-function iers_rot3_gcrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_mod(t::Number, m::IERSModel=iers2010b)
     return iers_pb(m, t/Tempo.CENTURY2SEC)
 end
 
 
 """
-    iers_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -40,7 +40,7 @@ the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_npb`](@ref) and [`iers_rot3_itrf_to_tod`](@ref).
 """
-function iers_rot3_gcrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, t)
@@ -53,7 +53,7 @@ end
 
 
 """
-    iers_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -69,7 +69,7 @@ the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2
 ## See also 
 See also [`mod_to_gtod3`](@ref) and [`iers_rot3_itrf_to_gtod`](@ref).
 """
-function iers_rot3_gcrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, t)
@@ -86,7 +86,7 @@ end
 
 
 """
-    iers_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_pef(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
@@ -106,7 +106,7 @@ the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_rot3_gcrf_to_gtod`](@ref) and [`iers_rot3_itrf_to_pef`](@ref).
 """
-function iers_rot3_gcrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_pef(t::Number, m::IERSModel=iers2010b)
 
     # Compute the GCRF to GTOD rotation matrix
     RNPB = iers_rot3_gcrf_to_gtod(t, m)
@@ -126,7 +126,7 @@ end
 # ==============================================
 
 """
-    iers_rot3_itrf_to_pef(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_pef(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
@@ -138,7 +138,7 @@ the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_rot3_gcrf_to_pef`](@ref).
 """
-function iers_rot3_itrf_to_pef(t::Number, ::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_pef(t::Number, ::IERSModel=iers2010b)
 
     # Retrieve pole coordinates 
     xₚ = eop_xp(m, t)
@@ -154,7 +154,7 @@ iers_rot3_itrf_to_pef(::Number, ::CPND) = DCM(1I)
 
 
 """
-    iers_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -170,7 +170,7 @@ the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2
 ## See also 
 See also [`iers_rot3_itrf_to_pef`](@ref) and [`iers_rot3_gcrf_to_gtod`](@ref).
 """
-function iers_rot3_itrf_to_gtod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
     # Compute ITRF to PEF rotation
     W  = iers_rot3_itrf_to_pef(t, m)
@@ -183,7 +183,7 @@ end
 
 
 """
-    iers_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -195,7 +195,7 @@ the True-of-Date (TOD) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_rot3_itrf_to_gtod`](@ref) and [`iers_rot3_gcrf_to_tod`](@ref).
 """
-function iers_rot3_itrf_to_tod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
     # Compute EOP nutation corrections 
     δΔψ = eop_δΔψ(m, t)
@@ -211,7 +211,7 @@ end
 
 
 """
-    iers_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_mod(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
@@ -223,7 +223,7 @@ the Mean-of-Date (MOD) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_rot3_itrf_to_tod`](@ref) and [`iers_rot3_gcrf_to_mod`](@ref).
 """
-function iers_rot3_itrf_to_mod(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_mod(t::Number, m::IERSModel=iers2010b)
 
     # Compute ITRF to GTOD rotation 
     W = iers_rot3_itrf_to_gtod(m, t)
@@ -243,7 +243,7 @@ end
 # ==============================================
 
 """
-    iers_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_cirf(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Celestial Intermediate Reference Frame (CIRF) at time `t`, expressed in TT seconds 
@@ -259,12 +259,12 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_gcrf_to_itrf`](@ref).
 """
-function iers_rot3_gcrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_cirf(t::Number, m::IERSModel=iers2010b)
     return iers_cip_motion(m, t/Tempo.CENTURY2SEC, eop_δX(m, t), eop_δY(m, t))
 end
 
 """
-    iers_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_tirf(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the Terrestrial Intermediate Reference Frame (TIRF) at time `t`, expressed in TT seconds 
@@ -280,7 +280,7 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_gcrf_to_itrf`](@ref).
 """
-function iers_rot3_gcrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_tirf(t::Number, m::IERSModel=iers2010b)
 
     # Convert TT seconds to UT1 days since J2000
     ut1_d = (t + offset_tt2ut1(t))/Tempo.DAY2SEC
@@ -297,7 +297,7 @@ end
 
 
 """
-    iers_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_gcrf_to_itrf(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the Geocentric Celestial Reference Frame (GCRF) to 
 the International Terrestrial Reference Frame (ITRF) at time `t`, expressed in TT seconds 
@@ -316,7 +316,7 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_gcrf_to_tirf`](@ref).
 """
-function iers_rot3_gcrf_to_itrf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_gcrf_to_itrf(t::Number, m::IERSModel=iers2010b)
 
     # Compute the GCRF to TIRF rotation matrix
     RQ = iers_rot3_gcrf_to_tirf(t, m)
@@ -337,7 +337,7 @@ end
 # ==============================================
 
 """
-    iers_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_tirf(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Terrestrial Intermediate Reference Frame (TIRF) at time `t`, expressed in TT seconds 
@@ -352,7 +352,7 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_itrf_to_cirf`](@ref).
 """
-function iers_rot3_itrf_to_tirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_tirf(t::Number, m::IERSModel=iers2010b)
 
     # Retrieve pole coordinates 
     xₚ = eop_xp(m, t)
@@ -367,7 +367,7 @@ iers_rot3_itrf_to_tirf(::Number, ::CPND) = DCM(1I)
 
 
 """
-    iers_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+    iers_rot3_itrf_to_cirf(t::Number, m::IERSModel=iers2010b)
 
 Compute the rotation matrix from the International Terrestrial Reference Frame (ITRF) to 
 the Celestial Intermediate Reference Frame (CIRF) at time `t`, expressed in TT seconds 
@@ -382,7 +382,7 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_cirf`](@ref) and [`iers_rot3_itrf_to_tirf`](@ref).
 """
-function iers_rot3_itrf_to_cirf(t::Number, m::IERSConventions=iers2010b)
+function iers_rot3_itrf_to_cirf(t::Number, m::IERSModel=iers2010b)
 
     # Convert TT seconds to UT1 days since J2000
     ut1_d = (t + offset_tt2ut1(t))/Tempo.DAY2SEC
@@ -404,7 +404,7 @@ end
 # ==============================================
 
 # Low-level function to avoid repeating the same data
-function mod_to_gtod3(t::Number, m::IERSConventions, δΔψ::Number, δΔϵ::Number)
+function mod_to_gtod3(t::Number, m::IERSModel, δΔψ::Number, δΔϵ::Number)
 
     # Rather than calling the `iers_nutation` function, we manually assembly 
     # the nutation matrix so that we don't have to compute 
