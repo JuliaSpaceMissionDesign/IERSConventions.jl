@@ -7,7 +7,7 @@ const CI = get(ENV, "CI", "false") == "true"
 makedocs(;
     authors="Julia Space Mission Design Development Team",
     sitename="IERSConventions.jl",
-    modules=[IERS],
+    modules=[IERSConventions],
     format=Documenter.HTML(; prettyurls=CI, highlights=["yaml"], ansicolor=true),
     pages=[
         "Home" => "index.md",
