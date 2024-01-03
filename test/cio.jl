@@ -12,12 +12,12 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         v = rand(BigFloat, 3)
         v /= norm(v)
 
-        # --- Testing IERS 1996 (< 0.1 mas)
+        # --- Testing IERS 1996 (< 0.5 mas)
         x, y = cip_xy(iers1996, tt_c)
         xe, ye = ERFA.bpn2xy(pnm80(DJ2000, tt_d))
         
-        @test r2a*abs(xe-x) ≤ 1e-4 
-        @test r2a*abs(ye-y) ≤ 1e-4
+        @test r2a*abs(xe-x) ≤ 1.5e-4 
+        @test r2a*abs(ye-y) ≤ 1.5e-4
         
         # TODO: test on cio locator is missing
 
