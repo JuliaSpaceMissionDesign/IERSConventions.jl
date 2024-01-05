@@ -1,13 +1,4 @@
 
-# EOP Data structures 
-# =========================================
-
-# TODO: write me 
-
-
-# EOP Retrival functions 
-# =========================================
-
 """
     eop_δΔψ(m::IERSModel, t::Number)
 
@@ -136,45 +127,3 @@ function offset_tt2ut1(seconds)
 end
 
 
-# EOP Conversion functions 
-# =========================================
-
-# Function to convert nutation corrections to CIP corrections and viceversa
-function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
-    
-    # Compute the precession angles 
-    ϵ₀, ψₐ, _, χₐ = precession_angles_rot4(m, t)
-
-    # Compute sine\cosine of mean obliquity
-    se = sin(orient_obliquity(m, t))
-    ce = cos(ϵ₀)
-
-    c = ψₐ*ce - χₐ
-
-    # Convert nutation corrections 
-    δx = δΔψ*se + c*δΔϵ
-    δy = δΔϵ - c*se*δΔψ
-
-    return δx, δy
-
-end
-
-function δcip_to_δnut(m::IERSModel, t::Number, δx::Number, δy::Number)
-
-    # Compute the precession angles 
-    ϵ₀, ψₐ, _, χₐ = precession_angles_rot4(m, t)
-
-    # Compute sine\cosine of mean obliquity
-    se = sin(orient_obliquity(m, t))
-    ce = cos(ϵ₀)
-
-    c = ψₐ*ce - χₐ
-    d = 1 + c^2 
-
-    # Convert CIP corrections 
-    δΔψ = (δx - c*δy)/se/d
-    δΔϵ = (δy + c*δx)/d
-
-    return δΔψ, δΔϵ
-
-end

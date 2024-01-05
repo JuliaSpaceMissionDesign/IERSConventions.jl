@@ -1,14 +1,16 @@
 module IERSConventions
 
-    using Tempo
-
+    using DelimitedFiles
     using PrecompileTools
     using ReferenceFrameRotations
     using StaticArrays
 
+    using Tempo
+    using JSMDInterfaces.Math: AbstractInterpolationMethod, interpolate
+    using JSMDUtils.Math: InterpAkima, arcsec2rad
+
     # Basic definitions
     include("models.jl")
-    include("angles.jl")
     include("poisson.jl")
 
     # Fundamental arguments
@@ -32,7 +34,10 @@ module IERSConventions
     include("polar.jl")
 
     # EOP functions 
-    include("eop.jl")
+    include("eop/data.jl")
+    include("eop/parsers.jl")
+    include("eop/loaders.jl")
+    include("eop/retrieval.jl")
 
     # Rotation functions 
     include("rotations.jl")
