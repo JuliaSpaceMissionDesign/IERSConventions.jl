@@ -162,7 +162,20 @@ end
 # EOP Conversion functions 
 # =========================================
 
-# Function to convert nutation corrections to CIP corrections and viceversa
+"""
+    δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
+
+Convert nutation corrections in longitude `δΔψ` and obliquity `δΔϵ` to CIP corrections 
+`δX`, `δY` at time `t` expressed in TT Julian centuries since J2000 for model `m`. All 
+input and output EOP are given in radians. 
+
+### References 
+- IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
+- Paris IERS observatory FTP server (UAI2000 package).
+
+### See also 
+See also [`δcip_to_δnut`](@ref).
+"""
 function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
     
     # Compute the precession angles 
@@ -182,6 +195,21 @@ function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
 
 end
 
+
+"""
+    δcip_to_δnut(m::IERSModel, t::Number, δX::Number, δY::Number)
+
+Convert CIP corrections `δX`, `δY` to nutation corrections in longitude `δΔψ` and obliquity 
+`δΔϵ` to  at time `t` expressed in TT Julian centuries since J2000 for model `m`. All 
+input and output EOP are given in radians. 
+
+### References 
+- IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
+- Paris IERS observatory FTP server (UAI2000 package).
+
+### See also 
+See also [`δnut_to_δcip`](@ref).
+"""
 function δcip_to_δnut(m::IERSModel, t::Number, δx::Number, δy::Number)
 
     # Compute the precession angles 
