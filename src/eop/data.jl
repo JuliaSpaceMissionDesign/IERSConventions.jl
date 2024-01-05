@@ -211,6 +211,6 @@ const IERS_EOP_DATA = EOPData();
 Earth Orientation Parameters (EOP) interpolators. 
 
 ### See also 
-See also [`load_eop!`](@ref) and [`EOPInterpolator`](@ref).
+See also [`eop_load_data!`](@ref) and [`EOPInterpolator`](@ref).
 """
 const IERS_EOP = EOPInterpolator();
