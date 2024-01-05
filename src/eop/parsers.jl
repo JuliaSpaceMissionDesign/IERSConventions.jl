@@ -134,7 +134,7 @@ See also [`eop_parse_csv`](@ref).
 """
 function eop_write_data(data, output_filename)
     writedlm(output_filename * ".eop.dat", data)
-    @info "IERS EOP file '$(filename)' converted to '$(output_filename).eop.dat'."
+    @info "IERS EOP file converted to '$(output_filename).eop.dat'."
     nothing
 end
 
