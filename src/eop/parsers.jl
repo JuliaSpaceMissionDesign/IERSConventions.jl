@@ -4,7 +4,6 @@ export eop_parse_csv
 """
     eop_parse_csv(m::IERSModel, inputfile, outputfile)
 
-
 Parse CSV files containing IERS EOP data and extracts the relevant information to a dedicated 
 JSMD `.eop.dat` file. Supported formats are the EOP C04 series and the Rapid Data 
 prediction (finals).
