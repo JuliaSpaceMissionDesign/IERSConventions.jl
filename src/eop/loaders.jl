@@ -19,17 +19,17 @@ function eop_load_data!(filename, m::IERS2010)
     IERS_EOP.init = true 
 
     # Set polar motion
-    IERS_EOP.xp = InterpAkima(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.xp)
-    IERS_EOP.yp = InterpAkima(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.yp)
+    IERS_EOP.xp = InterpAkima(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.xp)
+    IERS_EOP.yp = InterpAkima(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.yp)
 
-    IERS_EOP.lod = InterpAkima(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.LOD)
-    IERS_EOP.ut1_tt = InterpAkima(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.UT1_TT)
+    IERS_EOP.lod = InterpAkima(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.LOD)
+    IERS_EOP.ut1_tt = InterpAkima(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.UT1_TT)
     
     # Set nutation correction interpolators
     # TODO: ensure these are set! 
-    # nci1996 = NutCorrectionsInterpolator(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.nut1996)
-    # nci2003 = NutCorrectionsInterpolator(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.nut2003)
-    nci2010 = NutCorrectionsInterpolator(IERS_EOP_DATA.days_TT, IERS_EOP_DATA.nut2010)
+    # nci1996 = NutCorrectionsInterpolator(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.nut1996)
+    # nci2003 = NutCorrectionsInterpolator(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.nut2003)
+    nci2010 = NutCorrectionsInterpolator(IERS_EOP_DATA.cent_TT, IERS_EOP_DATA.nut2010)
 
     # IERS_EOP.nut1996 = nci1996
     # IERS_EOP.nut2003 = nci2003 
@@ -59,7 +59,7 @@ function eop_set_data!(filename, m::IERSModel)
     # Set data time stamps
     IERS_EOP_DATA.filename = filename
     IERS_EOP_DATA.days_UTC = days_utc
-    IERS_EOP_DATA.days_TT  = days_tt 
+    IERS_EOP_DATA.cent_TT  = days_tt/Tempo.CENTURY2DAY 
 
     # Set TT-to-UT1 offset and LOD
     IERS_EOP_DATA.UT1_TT = ut1_tt 

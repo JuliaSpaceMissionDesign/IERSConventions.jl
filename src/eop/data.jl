@@ -36,8 +36,8 @@ EOP Data container. Data is parameterised by time expressed in Terrestrial Time 
 
 ### Fields 
 - `filename` : File where the EOP data are stored. 
-- `days_UTC`: UTC days since J2000.
-- `days_TT` : TT days since J2000.
+- `days_UTC`: UTC Julian days since J2000.
+- `cent_TT` : TT Julian centuries since J2000.
 - `UT1_TT`: UT1 minus TT offset, in seconds.
 - `LOD`: Length of day offset (s).
 - `xp, yp`: Polar motion with respect to the crust (rad).
@@ -48,7 +48,7 @@ mutable struct EOPData{T}
     filename::String 
 
     days_UTC::Vector{T}
-    days_TT::Vector{T}
+    cent_TT::Vector{T}
 
     UT1_TT::Vector{T}
     LOD::Vector{T}
@@ -132,12 +132,12 @@ function NutCorrectionsInterpolator(::Type{T}) where T
     )
 end 
 
-function NutCorrectionsInterpolator(days_tt, nc::NutationCorrections) 
+function NutCorrectionsInterpolator(t, nc::NutationCorrections) 
     NutCorrectionsInterpolator(
-        InterpAkima(days_tt, nc.δX), 
-        InterpAkima(days_tt, nc.δY), 
-        InterpAkima(days_tt, nc.δΔψ), 
-        InterpAkima(days_tt, nc.δΔϵ)
+        InterpAkima(t, nc.δX), 
+        InterpAkima(t, nc.δY), 
+        InterpAkima(t, nc.δΔψ), 
+        InterpAkima(t, nc.δΔϵ)
     )
 end
 
@@ -174,6 +174,18 @@ end
 
 function Base.show(io::IO, i::EOPInterpolator)
     println(io, "EOPInterpolator(init=$(i.init))")
+end
+
+# Checks whether EOP data has been initialised successfully
+function eop_check_init()
+    if !IERS_EOP.init
+        throw(
+            ErrorException(
+                "EOP not initialized. Please run 'eop_load_data!' before using this function."
+            )
+        )
+    end
+    nothing
 end
 
 # Function to initialise a dummy Akima interpolator 
