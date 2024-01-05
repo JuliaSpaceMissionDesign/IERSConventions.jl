@@ -2,5 +2,6 @@
 ERFA = "17511681-8477-586a-8d98-4cfd5a1f2ec3"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 ReferenceFrameRotations = "74f56ac7-18b3-5285-802d-d4bd4f104033"
+RemoteFiles = "cbe49d4c-5af1-5b60-bb70-0a60aa018e1b"
 Tempo = "c33777b2-e695-4fae-9135-aeae8855dd81"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

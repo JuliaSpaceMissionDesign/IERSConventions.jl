@@ -111,7 +111,7 @@ function eop_read_data(filename)
     days_tt  = days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC
 
     # Compute UT1-TT, in seconds
-    sec_ut1 = days_utc/Tempo.DAY2SEC + Δut1
+    sec_ut1 = days_utc*Tempo.DAY2SEC + Δut1
     ut1_tt = sec_ut1 - days_tt*Tempo.DAY2SEC
 
     # Retrieve other quantities
