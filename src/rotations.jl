@@ -1,3 +1,16 @@
+export  iers_rot3_gcrf_to_mod, 
+        iers_rot3_gcrf_to_tod, 
+        iers_rot3_gcrf_to_gtod, 
+        iers_rot3_gcrf_to_pef, 
+        iers_rot3_itrf_to_mod, 
+        iers_rot3_itrf_to_tod, 
+        iers_rot3_itrf_to_gtod, 
+        iers_rot3_itrf_to_pef, 
+        iers_rot3_gcrf_to_cirf, 
+        iers_rot3_gcrf_to_itrf,
+        iers_rot3_gcrf_to_tirf, 
+        iers_rot3_itrf_to_cirf, 
+        iers_rot3_itrf_to_tirf
 
 # Equinox-based transformations from GCRF
 # ==============================================
@@ -67,7 +80,7 @@ the Greenwich True-of-Date (GTOD) at time `t`, expressed in TT seconds since `J2
     [`iers2010a`](@ref) models. 
 
 ## See also 
-See also [`mod_to_gtod3`](@ref) and [`iers_rot3_itrf_to_gtod`](@ref).
+See also [`iers_rot3_itrf_to_gtod`](@ref).
 """
 function iers_rot3_gcrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
