@@ -30,7 +30,7 @@ function eop_parse_csv(m::IERSModel, inputfile, outputfile)
     # Check whether the file is a Combined Series (C04) or the Rapid Data Series.
     isfinal = startswith(splitdir(inputfile)[2], "finals")
 
-    # Multiplicative factor to bring all quantities to seconds/arcseconds, since the in the 
+    # Multiplicative factor to bring all quantities to seconds/arcseconds, since in the 
     # rapid data series the LOD is given in milliseconds, and the dX, dY, dPsi and dEps 
     # corrections are in milliarcseconds. 
     fct = isfinal ? 1e-3 : 1.0 
