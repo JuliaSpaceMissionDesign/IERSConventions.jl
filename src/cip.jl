@@ -53,7 +53,7 @@ cip_xy
     cip_xys(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
 
 Compute the CIP X, Y and CIO locator s coordinates, in radians, following the IERS 
-conventions `m` at time `t`, expressed in `TT`` Julian centuries since J2000. Optional EOP 
+conventions `m` at time `t`, expressed in `TT` Julian centuries since J2000. Optional EOP 
 nutation corrections can be provided via the `δX` and `δY` parameters.
 
 !!! note 
