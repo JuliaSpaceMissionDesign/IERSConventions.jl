@@ -42,4 +42,10 @@ module IERSConventions
     # Rotation functions 
     include("rotations.jl")
 
+    function __init__()
+        if !Tempo.has_timescale(TIMESCALES, Tempo.timescale_id(UT1))
+            Tempo.add_timescale!(TIMESCALES, UT1, offset_tt2ut1; parent=TT)
+        end
+    end
+
 end
