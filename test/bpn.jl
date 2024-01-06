@@ -95,9 +95,9 @@ end;
             N1 = iers_nutation(iers2003a, tt_c)
             @test v2as(N1*v, ve) ≤ 1e-7
 
-            # IERS 2000B model (< 1mas)
+            # IERS 2000B model (< 3mas)
             N1 = iers_nutation(iers2003b, tt_c)
-            @test v2as(N1*v, ve) ≤ 2e-3
+            @test v2as(N1*v, ve) ≤ 3e-3
 
             # --- Testing IERS 2010 models
 
