@@ -55,12 +55,14 @@ See also [`iers_npb`](@ref) and [`iers_rot3_itrf_to_tod`](@ref).
 """
 function iers_rot3_gcrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
-    δΔψ = eop_δΔψ(m, t)
-    δΔϵ = eop_δΔϵ(m, t)
+    δΔψ = eop_δΔψ(m, ttc)
+    δΔϵ = eop_δΔϵ(m, ttc)
 
     # Compute Nutation-Precession-Bias matrix
-    return iers_npb(m, t/Tempo.CENTURY2SEC, δΔψ, δΔϵ)
+    return iers_npb(m, ttc, δΔψ, δΔϵ)
 
 end
 
@@ -84,15 +86,17 @@ See also [`iers_rot3_itrf_to_gtod`](@ref).
 """
 function iers_rot3_gcrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
-    δΔψ = eop_δΔψ(m, t)
-    δΔϵ = eop_δΔϵ(m, t)
+    δΔψ = eop_δΔψ(m, ttc)
+    δΔϵ = eop_δΔϵ(m, tct)
 
     # Retrieve precession-bias matrix
-    PB = iers_pb(m, tt_c)
+    PB = iers_pb(m, ttc)
 
     # Retrieve MOD-to-GTOD rotation 
-    RN = mod_to_gtod3(t, m, δΔψ, δΔϵ)
+    RN = mod_to_gtod3(ttc, m, δΔψ, δΔϵ)
     return RN*PB
 
 end
@@ -153,9 +157,11 @@ See also [`iers_rot3_gcrf_to_pef`](@ref).
 """
 function iers_rot3_itrf_to_pef(t::Number, ::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Retrieve pole coordinates 
-    xₚ = eop_xp(m, t)
-    yₚ = eop_yp(m, t)
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
 
     # Compute the polar motion rotation without the TIO contribution 
     # Note: this equation is wrongly reported on Vallado Fundamentals of Astrodyn. 4th Ed. 
@@ -210,14 +216,16 @@ See also [`iers_rot3_itrf_to_gtod`](@ref) and [`iers_rot3_gcrf_to_tod`](@ref).
 """
 function iers_rot3_itrf_to_tod(t::Number, m::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Compute EOP nutation corrections 
-    δΔψ = eop_δΔψ(m, t)
+    δΔψ = eop_δΔψ(m, ttc)
 
     # Compute ITRF to GTOD rotation 
     W = iers_rot3_itrf_to_gtod(m, t)
 
     # Compute GTOD to TOD rotation matrix 
-    R = angle_to_dcm(-iers_gast(m, t/Tempo.CENTURY2SEC, δΔψ), :Z)
+    R = angle_to_dcm(-iers_gast(m, ttc, δΔψ), :Z)
     return R*W
 
 end
@@ -238,15 +246,17 @@ See also [`iers_rot3_itrf_to_tod`](@ref) and [`iers_rot3_gcrf_to_mod`](@ref).
 """
 function iers_rot3_itrf_to_mod(t::Number, m::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Compute ITRF to GTOD rotation 
     W = iers_rot3_itrf_to_gtod(m, t)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
-    δΔψ = eop_δΔψ(m, t)
-    δΔϵ = eop_δΔϵ(m, t)
+    δΔψ = eop_δΔψ(m, ttc)
+    δΔϵ = eop_δΔϵ(m, ttc)
 
     # Compute GTOD-to-MOD rotation
-    RNt = mod_to_gtod3(t, m, δΔψ, δΔϵ)' 
+    RNt = mod_to_gtod3(ttc, m, δΔψ, δΔϵ)' 
     return RNt*W 
 
 end
@@ -272,8 +282,9 @@ since `J2000`, following the IERS Conventions `m`.
 ### See also 
 See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_gcrf_to_itrf`](@ref).
 """
-function iers_rot3_gcrf_to_cirf(t::Number, m::IERSModel=iers2010b)
-    return iers_cip_motion(m, t/Tempo.CENTURY2SEC, eop_δX(m, t), eop_δY(m, t))
+function iers_rot3_gcrf_to_cirf(t::Number, m::IERSModel=iers2010b)    
+    ttc = t/Tempo.CENTURY2SEC
+    return iers_cip_motion(m, ttc, eop_δX(m, ttc), eop_δY(m, ttc))
 end
 
 """
@@ -334,12 +345,14 @@ function iers_rot3_gcrf_to_itrf(t::Number, m::IERSModel=iers2010b)
     # Compute the GCRF to TIRF rotation matrix
     RQ = iers_rot3_gcrf_to_tirf(t, m)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Retrieve pole coordinates 
-    xₚ = eop_xp(m, t)
-    yₚ = eop_yp(m, t)
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
 
     # Compute the polar motion rotation
-    W = iers_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)
+    W = iers_polar_motion(m, xₚ, yₚ, ttc)
 
     return W*RQ
 
@@ -367,12 +380,14 @@ See also [`iers_rot3_gcrf_to_tirf`](@ref) and [`iers_rot3_itrf_to_cirf`](@ref).
 """
 function iers_rot3_itrf_to_tirf(t::Number, m::IERSModel=iers2010b)
 
+    ttc = t/Tempo.CENTURY2SEC
+
     # Retrieve pole coordinates 
-    xₚ = eop_xp(m, t)
-    yₚ = eop_yp(m, t)
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
 
     # Compute the polar motion rotation
-    return iers_polar_motion(m, xₚ, yₚ, t/Tempo.CENTURY2SEC)'
+    return iers_polar_motion(m, xₚ, yₚ, ttc)'
 
 end
 
@@ -417,29 +432,26 @@ end
 # ==============================================
 
 # Low-level function to avoid repeating the same data
-function mod_to_gtod3(t::Number, m::IERSModel, δΔψ::Number, δΔϵ::Number)
+function mod_to_gtod3(ttc::Number, m::IERSModel, δΔψ::Number, δΔϵ::Number)
 
     # Rather than calling the `iers_nutation` function, we manually assembly 
     # the nutation matrix so that we don't have to compute 
     # the nutation components twice (for N and for GAST)
 
-    # Convert TT seconds to TT Julian centuries since J2000
-    tt_c = t/Tempo.CENTURY2SEC
-
     # Compute mean obliquity at epoch 
-    ϵₐ = iers_obliquity(m, tt_c)
+    ϵₐ = iers_obliquity(m, ttc)
 
     # Compute nutation in longitude and obliquity 
-    Δψ, Δϵ = iers_nutation_comp(m, tt_c)
+    Δψ, Δϵ = iers_nutation_comp(m, ttc)
 
     # Compute nutation matrix with EOP corrections
     N = angle_to_dcm(ϵₐ, - (Δψ + δΔψ), - (ϵₐ + Δϵ + δΔϵ), :XZX)
 
     # Compute Greenwich Mean Sidereal Time 
-    gmst = iers_gmst(m, tt_c)
+    gmst = iers_gmst(m, ttc)
 
     # Manually compute the equation of the equinoxes
-    gast = gmst + (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, tt_c)
+    gast = gmst + (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, ttc)
 
     # Compute sidereal rotation matrix
     R = angle_to_dcm(gast, :Z)
