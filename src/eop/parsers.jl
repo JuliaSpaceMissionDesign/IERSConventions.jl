@@ -1,5 +1,5 @@
 
-export eop_parse_csv 
+export eop_parse_csv, eop_parse_txt
 
 """
     eop_parse_csv(m::IERSModel, inputfile, outputfile)
@@ -24,6 +24,9 @@ prediction (finals).
 
 ### References 
 # TODO: add websites
+
+### See also 
+See also [`eop_parse_txt`](@ref). 
 """
 function eop_parse_csv(m::IERSModel, inputfile, outputfile)
 
@@ -121,6 +124,104 @@ end
 
 
 """
+    eop_parse_txt(m::IERSModel, inputfile, outputfile)
+
+Parse TXT files containing IERS EOP C04 data and extracts the relevant information to a 
+dedicated JSMD `.eop.dat` file. 
+
+!!! note 
+    The `outputfile` name should not include the file extension, which is automatically 
+    added by this function.  
+
+!!! note 
+    Depending on the type of file, either the CIP or the nutation corrections may be present. 
+    This function applies a conversion algorithm to automatically retrieve the missing data.
+
+!!! warning 
+    This routine recognises the file structure and column ordering by analysing the 
+    input file name, which should be left equal to the one retrieved from the IERS website.
+
+### See also 
+See also [`eop_parse_csv`](@ref). 
+"""
+function eop_parse_txt(m::IERSModel, inputfile, outputfile)
+
+    # Check that the starting file pattern matches the EOPC04 nomenclature
+    filename = splitdir(inputfile)[2]
+    if !startswith(filename, "eopc04")
+        throw(ArgumentError("Unsupported EOP C04 filename!"))
+    end
+
+    # Retrieve ITRF version
+    itrfv = parse(Int, filename[8:9])
+    if itrfv == 14 
+
+        hascip = occursin("IAU2000", filename)
+        idxs = [4, 8, 7, 5, 6, 9, 10]
+
+        # In this version, the EOP data starts at the 15th row
+        data = readdlm(inputfile; header=false, skipstart=14)
+
+    elseif itrfv == 20 
+        
+        hascip = true
+        idxs = [5, 13, 8, 6, 7, 9, 10]
+        
+        # Parse the data file. In this version, the header is completely commented
+        data = readdlm(inputfile; header=false, comments=true)
+
+    else 
+        throw(ArgumentError("Unsupported ITRF version."))
+    end
+
+    # In this case we don't have issues of missing data. 
+    # Thus we immediately convert everything. 
+    mjd = @view(data[:, idxs[1]])
+    lod = @view(data[:, idxs[2]])
+    Δut1 = @view(data[:, idxs[3]])
+
+    # Convert UTC days to TT centuries (for the correction conversion)
+    days_utc = mjd .- Tempo.DMJD 
+    days_tai = map(t->Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
+    cent_tt  = (days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC)/Tempo.CENTURY2DAY
+
+    # Retrieve the pole coordinates 
+    xp = @view(data[:, idxs[4]])
+    yp = @view(data[:, idxs[5]])
+
+    k = π/648000
+        
+    # Retrieve the CIP and nutation corrections
+    if hascip
+        δX = @view(data[:, idxs[6]])
+        δY = @view(data[:, idxs[7]])
+
+        # Convert CIP into nutation corrections 
+        corr = map((t, dx, dy)->δcip_to_δnut(m, t, dx*k, dy*k), cent_tt, δX, δY)
+        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+
+    else 
+        δΔψ = @view(data[:, idxs[6]])
+        δΔϵ = @view(data[:, idxs[7]])
+
+        corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
+        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+    end
+
+    # Write the EOP data to the desired file
+    eop_write_data(
+        hcat(
+            days_utc, xp, yp, Δut1, 
+            round.(lod; digits=7), round.(δX; digits=7), round.(δY; digits=7), 
+            round.(δΔψ; digits=7), round.(δΔϵ; digits=7)
+        ), 
+        outputfile
+    )
+
+end
+
+
+"""
     eop_write_data(data, output_filename)
 
 Write the EOP data stored in the matrix `data` to a dedicated JSMD `.eop-dat` file.  
@@ -130,7 +231,7 @@ Write the EOP data stored in the matrix `data` to a dedicated JSMD `.eop-dat` fi
     added by this function.  
 
 ### See also 
-See also [`eop_parse_csv`](@ref). 
+See also [`eop_parse_csv`](@ref) and [`eop_parse_txt`](@ref). 
 """
 function eop_write_data(data, output_filename)
     writedlm(output_filename * ".eop.dat", data)
