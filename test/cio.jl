@@ -6,7 +6,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
     for _ in 1:50
 
-        tt_c = rand()/2
+        tt_c = rand()
         tt_d = tt_c*Tempo.CENTURY2DAY
 
         v = rand(BigFloat, 3)
@@ -16,8 +16,8 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         x, y = cip_xy(iers1996, tt_c)
         xe, ye = ERFA.bpn2xy(pnm80(DJ2000, tt_d))
         
-        @test r2a*abs(xe-x) ≤ 1.5e-4 
-        @test r2a*abs(ye-y) ≤ 1.5e-4
+        @test r2a*abs(xe-x) ≤ 3e-4 
+        @test r2a*abs(ye-y) ≤ 3e-4
         
         # TODO: test on cio locator is missing
 
@@ -52,26 +52,26 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         @test r2a*abs(cip[3] - Q[3, 3]) ≤ 1e-7
 
 
-        # --- Testing IERS 2003B model (< 2.5 mas)
+        # --- Testing IERS 2003B model (< 3 mas)
         # CIP coordinates
         x, y = cip_xy(iers2003b, tt_c)
 
-        @test r2a*abs(xe-x) ≤ 2.5e-3
-        @test r2a*abs(ye-y) ≤ 2.5e-3
+        @test r2a*abs(xe-x) ≤ 3e-3
+        @test r2a*abs(ye-y) ≤ 3e-3
 
         # CIO coordinates 
         s = cip_xys(iers2003b, tt_c)[3]
-        @test r2a*abs(se-s) ≤ 2.5e-3
+        @test r2a*abs(se-s) ≤ 3e-3
 
         # CIP motion matrix
         Qe = c2i00a(DJ2000, tt_d)
-        @test v2as(Qe*v, Q*v) ≤ 2.5e-3
+        @test v2as(Qe*v, Q*v) ≤ 3e-3
 
         # CIP vector 
         cip = cip_vector(iers2003b, tt_c)
-        @test r2a*abs(cip[1] - xe)      ≤ 2.5e-3
-        @test r2a*abs(cip[2] - ye)      ≤ 2.5e-3
-        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 2.5e-3
+        @test r2a*abs(cip[1] - xe)      ≤ 3e-3
+        @test r2a*abs(cip[2] - ye)      ≤ 3e-3
+        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 3e-3
 
 
         # --- Testing IERS 2010A model (< 1 μas)
@@ -99,70 +99,70 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         @test r2a*abs(cip[3] - Q[3, 3]) ≤ 1e-7
 
 
-        # --- Testing IERS 2010B model (< 2.5 mas)
+        # --- Testing IERS 2010B model (< 3 mas)
         # CIP coordinates
         x, y = cip_xy(iers2010b, tt_c)
 
-        @test r2a*abs(xe-x) ≤ 2.5e-3
-        @test r2a*abs(ye-y) ≤ 2.5e-3
+        @test r2a*abs(xe-x) ≤ 3e-3
+        @test r2a*abs(ye-y) ≤ 3e-3
 
         # CIO coordinates 
         s = cip_xys(iers2010b, tt_c)[3]
-        @test r2a*abs(se-s) ≤ 2.5e-3
+        @test r2a*abs(se-s) ≤ 1e-5
 
         # CIP motion matrix
         Q = iers_cip_motion(iers2010b, tt_c)
-        @test v2as(Qe*v, Q*v) ≤ 2.5e-3
+        @test v2as(Qe*v, Q*v) ≤ 3e-3
 
         # CIP vector 
         cip = cip_vector(iers2010b, tt_c)
-        @test r2a*abs(cip[1] - xe)      ≤ 2.5e-3
-        @test r2a*abs(cip[2] - ye)      ≤ 2.5e-3
-        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 2.5e-3
+        @test r2a*abs(cip[1] - xe)      ≤ 3e-3
+        @test r2a*abs(cip[2] - ye)      ≤ 3e-3
+        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 3e-3
 
 
-        # --- Testing CPNc model (< 15 mas)
+        # --- Testing CPNc model (< 50 mas)
         # CIP coordinates
         x, y = cip_xy(CPNc, tt_c)
 
-        @test r2a*abs(xe-x) ≤ 15e-3
-        @test r2a*abs(ye-y) ≤ 15e-3
+        @test r2a*abs(xe-x) ≤ 50e-3
+        @test r2a*abs(ye-y) ≤ 50e-3
 
         # CIO coordinates 
         s = cip_xys(CPNc, tt_c)[3]
-        @test r2a*abs(se-s) ≤ 15e-3
+        @test r2a*abs(se-s) ≤ 1e-3
 
         # CIP motion matrix
         Q = iers_cip_motion(CPNc, tt_c)
-        @test v2as(Qe*v, Q*v) ≤ 15e-3
+        @test v2as(Qe*v, Q*v) ≤ 50e-3
 
         # CIP vector 
         cip = cip_vector(CPNc, tt_c)
-        @test r2a*abs(cip[1] - xe)      ≤ 15e-3
-        @test r2a*abs(cip[2] - ye)      ≤ 15e-3
-        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 15e-3
+        @test r2a*abs(cip[1] - xe)      ≤ 50e-3
+        @test r2a*abs(cip[2] - ye)      ≤ 50e-3
+        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 50e-3
         
 
-        # --- Testing CPNd model (< 1 as)
+        # --- Testing CPNd model (< 2 as)
         # CIP coordinates
         x, y = cip_xy(CPNd, tt_c)
 
-        @test r2a*abs(xe-x) ≤ 1
-        @test r2a*abs(ye-y) ≤ 1
+        @test r2a*abs(xe-x) ≤ 2
+        @test r2a*abs(ye-y) ≤ 2
 
         # CIO coordinates 
         s = cip_xys(CPNd, tt_c)[3]
-        @test r2a*abs(se-s) ≤ 1
+        @test r2a*abs(se-s) ≤ 0.1
 
         # CIP motion matrix
         Q = iers_cip_motion(CPNd, tt_c)
-        @test v2as(Qe*v, Q*v) ≤ 1
+        @test v2as(Qe*v, Q*v) ≤ 2
 
         # CIP vector 
         cip = cip_vector(CPNd, tt_c)
-        @test r2a*abs(cip[1] - xe)      ≤ 1
-        @test r2a*abs(cip[2] - ye)      ≤ 1
-        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 1
+        @test r2a*abs(cip[1] - xe)      ≤ 2
+        @test r2a*abs(cip[2] - ye)      ≤ 2
+        @test r2a*abs(cip[3] - Q[3, 3]) ≤ 2
         
     end
 

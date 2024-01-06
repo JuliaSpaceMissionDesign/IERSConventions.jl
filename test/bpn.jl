@@ -26,7 +26,7 @@ end;
 
     @testset "Nutation Components" verbose = true begin
         for _ in 1:50
-            tt_c = rand()/2 
+            tt_c = rand() 
             tt_d = tt_c*Tempo.CENTURY2DAY
 
             # -- Testing IERS 1996 model (< 0.1μas)
@@ -57,20 +57,20 @@ end;
             @test r2a*abs(Δψ - Δp) ≤ 1e-7
             @test r2a*abs(Δϵ - Δe) ≤ 1e-7
 
-            # -- Testing IERS 2010B model (< 2mas)
+            # -- Testing IERS 2010B model (< 3mas)
             Δψ, Δϵ = iers_nutation_comp(iers2010b, tt_c)
-            @test r2a*abs(Δψ - Δp) ≤ 2e-3
-            @test r2a*abs(Δϵ - Δe) ≤ 2e-3
+            @test r2a*abs(Δψ - Δp) ≤ 3e-3
+            @test r2a*abs(Δϵ - Δe) ≤ 3e-3
             
-            # -- Testing IERS CPNc model (< 30mas)
+            # -- Testing IERS CPNc model (< 50mas)
             Δψ, Δϵ = iers_nutation_comp(CPNc, tt_c)
-            @test r2a*abs(Δψ - Δp) ≤ 35e-3
-            @test r2a*abs(Δϵ - Δe) ≤ 35e-3
+            @test r2a*abs(Δψ - Δp) ≤ 50e-3
+            @test r2a*abs(Δϵ - Δe) ≤ 50e-3
 
-            # -- Testing IERS CPNd model (< 1as)
+            # -- Testing IERS CPNd model (< 2as)
             Δψ, Δϵ = iers_nutation_comp(CPNd, tt_c)
-            @test r2a*abs(Δψ - Δp) ≤ 1
-            @test r2a*abs(Δϵ - Δe) ≤ 1
+            @test r2a*abs(Δψ - Δp) ≤ 2
+            @test r2a*abs(Δϵ - Δe) ≤ 2
         end
     end
 
@@ -80,7 +80,6 @@ end;
             tt_d = tt_c*Tempo.CENTURY2DAY
 
             v = rand(BigFloat, 3)
-            v /= norm(v)
 
             # --- Testing IERS 1996 model (< 0.1μas)
             N1 = iers_nutation(iers1996, tt_c)
@@ -90,7 +89,7 @@ end;
             # --- Testing IERS 2003 models
 
             Ne = num00a(DJ2000, tt_d)
-            ve = Ne*v; ve /= norm(ve);
+            ve = Ne*v; 
 
             # IERS 2000A model (< 0.1μas)
             N1 = iers_nutation(iers2003a, tt_c)
@@ -103,23 +102,23 @@ end;
             # --- Testing IERS 2010 models
 
             Ne = num06a(DJ2000, tt_d)
-            ve = Ne*v; ve /= norm(ve);
+            ve = Ne*v; 
 
             # IERS 2010A model (< 0.1μas)
             N1 = iers_nutation(iers2010a, tt_c)
             @test v2as(N1*v, ve) ≤ 1e-7
 
-            # IERS 2010B model (< 1mas)
+            # IERS 2010B model (< 3mas)
             N1 = iers_nutation(iers2010b, tt_c)
-            @test v2as(N1*v, ve) ≤ 2e-3
+            @test v2as(N1*v, ve) ≤ 3e-3
 
-            # CPNc model (< 35mas)
+            # CPNc model (< 50mas)
             N1 = iers_nutation(CPNc, tt_c)
-            @test v2as(N1*v, ve) ≤ 35e-3
+            @test v2as(N1*v, ve) ≤ 50e-3
 
-            # CPNd model (< 1mas)
+            # CPNd model (< 2as)
             N1 = iers_nutation(CPNd, tt_c)
-            @test v2as(N1*v, ve) ≤ 1
+            @test v2as(N1*v, ve) ≤ 2
 
         end
 
@@ -252,7 +251,7 @@ end;
 
     for _ in 1:50
 
-        tt_c = rand()/4
+        tt_c = rand()
         tt_d = tt_c*Tempo.CENTURY2DAY
 
         v = rand(BigFloat, 3)
@@ -319,17 +318,17 @@ end;
         NPB = iers_npb(iers2010a, tt_c)
         @test v2as(NPBe*v, NPB*v) ≤ 1e-6
 
-        # 2010B model < 2.5 mas
+        # 2010B model < 3 mas
         NPB = iers_npb(iers2010b, tt_c)
-        @test v2as(NPBe*v, NPB*v) ≤ 2.5e-3
+        @test v2as(NPBe*v, NPB*v) ≤ 3e-3
 
-        # CPNc model < 40 mas
+        # CPNc model < 50 mas
         NPB = iers_npb(CPNc, tt_c)
-        @test v2as(NPBe*v, NPB*v) ≤ 40e-3
+        @test v2as(NPBe*v, NPB*v) ≤ 50e-3
 
-        # CPNd model < 1 mas
+        # CPNd model < 2 mas
         NPB = iers_npb(CPNd, tt_c)
-        @test v2as(NPBe*v, NPB*v) ≤ 1
+        @test v2as(NPBe*v, NPB*v) ≤ 2
     end
 
 end;

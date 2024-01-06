@@ -76,34 +76,34 @@ r2a = 180 / π * 3600
         @test r2a*abs(ga-gst) ≤ 1e-6
 
 
-        # --- Testing 2010B model (< 2.5 mas)
+        # --- Testing 2010B model (< 3 mas)
         # GMST 
         gm  = iers_gmst(iers2010b, tt_c)
-        @test r2a*abs(gm-gme) ≤ 2.5e-3
+        @test r2a*abs(gm-gme) ≤ 3e-3
 
         # GAST
         ga  = iers_gast(iers2010b, tt_c)
-        @test r2a*abs(ga-gst) ≤ 2.5e-3
+        @test r2a*abs(ga-gst) ≤ 3e-3
 
 
-        # --- Testing CPNc model (< 35 mas)
+        # --- Testing CPNc model (< 50 mas)
         # GMST 
         gm  = iers_gmst(CPNc, tt_c)
-        @test r2a*abs(gm-gme) ≤ 35e-3
+        @test r2a*abs(gm-gme) ≤ 50e-3
 
         # GAST
         ga  = iers_gast(CPNc, tt_c)
-        @test r2a*abs(ga-gst) ≤ 35e-3
+        @test r2a*abs(ga-gst) ≤ 50e-3
 
 
-        # --- Testing CPNd model (< 15 mas)
+        # --- Testing CPNd model (< 2 as)
         # GMST 
         gm  = iers_gmst(CPNd, tt_c)
-        @test r2a*abs(gm-gme) ≤ 1
+        @test r2a*abs(gm-gme) ≤ 2
 
         # GAST
         ga  = iers_gast(CPNd, tt_c)
-        @test r2a*abs(ga-gst) ≤ 1
+        @test r2a*abs(ga-gst) ≤ 2
 
     end
 
