@@ -68,23 +68,29 @@ function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
     last_row = findlast(!isempty, @view(data[:, idxs[3]]))
 
     mjd  = convert(Vector{Float64}, @view(data[1:last_row, idxs[1]]))
-    Δut1 = convert(Vector{Float64}, @view(data[1:last_row, idxs[3]]))
+
+    # Currently discard all data for dates before 1 January 1972 UTC, since the TAI-UTC 
+    # transformation is undefined. 
+    mjd_1972  = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
+    first_row = findfirst(x -> x >= mjd_1972, mjd)
+
+    Δut1 = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[3]]))
 
     # Convert UTC days to TT centuries (for the corrections conversion)
-    days_utc = mjd .- Tempo.DMJD 
+    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD 
     days_tai = map(t->Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
     cent_tt  = (days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC)/Tempo.CENTURY2DAY
     
     # Retrieve pole coordinates 
-    xp = convert(Vector{Float64}, @view(data[1:last_row, idxs[4]]))
-    yp = convert(Vector{Float64}, @view(data[1:last_row, idxs[5]]))
+    xp = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[4]]))
+    yp = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[5]]))
 
     # Retrieve columns with optional missing data 
-    raw_lod = @view(data[1:last_row, idxs[2]])
-    raw_δX  = @view(data[1:last_row, idxs[6]])
-    raw_δY  = @view(data[1:last_row, idxs[7]])
-    raw_δΔψ = @view(data[1:last_row, idxs[8]])
-    raw_δΔϵ = @view(data[1:last_row, idxs[9]])
+    raw_lod = @view(data[first_row:last_row, idxs[2]])
+    raw_δX  = @view(data[first_row:last_row, idxs[6]])
+    raw_δY  = @view(data[first_row:last_row, idxs[7]])
+    raw_δΔψ = @view(data[first_row:last_row, idxs[8]])
+    raw_δΔϵ = @view(data[first_row:last_row, idxs[9]])
 
     # Fill missing LOD elements
     lod = fct*fill_eop_data(raw_lod)
@@ -174,35 +180,40 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
         throw(ArgumentError("Unsupported ITRF version."))
     end
 
-    # In this case we don't have issues of missing data. 
-    # Thus we immediately convert everything. 
+    # In this case we don't have issues of missing data. Thus we convert everything. 
     mjd = @view(data[:, idxs[1]])
-    lod = @view(data[:, idxs[2]])
-    Δut1 = @view(data[:, idxs[3]])
+
+    # Currently discard all data for dates before 1 January 1972 UTC, since the TAI-UTC 
+    # transformation is undefined. 
+    mjd_1972  = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
+    first_row = findfirst(x -> x >= mjd_1972, mjd)
+
+    lod = @view(data[first_row:end, idxs[2]])
+    Δut1 = @view(data[first_row:end, idxs[3]])
 
     # Convert UTC days to TT centuries (for the correction conversion)
-    days_utc = mjd .- Tempo.DMJD 
+    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD 
     days_tai = map(t->Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
     cent_tt  = (days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC)/Tempo.CENTURY2DAY
 
     # Retrieve the pole coordinates 
-    xp = @view(data[:, idxs[4]])
-    yp = @view(data[:, idxs[5]])
+    xp = @view(data[first_row:end, idxs[4]])
+    yp = @view(data[first_row:end, idxs[5]])
 
     k = π/648000
         
     # Retrieve the CIP and nutation corrections
     if hascip
-        δX = @view(data[:, idxs[6]])
-        δY = @view(data[:, idxs[7]])
+        δX = @view(data[first_row:end, idxs[6]])
+        δY = @view(data[first_row:end, idxs[7]])
 
         # Convert CIP into nutation corrections 
         corr = map((t, dx, dy)->δcip_to_δnut(m, t, dx*k, dy*k), cent_tt, δX, δY)
         δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
 
     else 
-        δΔψ = @view(data[:, idxs[6]])
-        δΔϵ = @view(data[:, idxs[7]])
+        δΔψ = @view(data[first_row:end, idxs[6]])
+        δΔϵ = @view(data[first_row:end, idxs[7]])
 
         corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
         δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
