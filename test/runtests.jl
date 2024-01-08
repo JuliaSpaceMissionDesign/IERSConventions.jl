@@ -19,7 +19,7 @@ download(EOP_DATA_FILE; verbose=true, force=false)
 @info "Initialise EOP data"
 let
     eopfile = joinpath(@__DIR__, "assets", "iau2000a")
-    eop_parse_csv(iers2010a, path(EOP_DATA_FILE), eopfile)
+    eop_generate_from_csv(iers2010a, path(EOP_DATA_FILE), eopfile)
     eop_load_data!(eopfile*".eop.dat", iers2010a)
 end;
 

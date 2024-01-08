@@ -5,7 +5,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
 # With that epoch lists, retrieve all the required EOP data 
 eopfile = "test/assets/eopc04_20.1972-now.txt"
-eop_parse_txt(iers2010a, eopfile, "test/assets/eopc04")
+eop_generate_from_txt(iers2010a, eopfile, "test/assets/eopc04")
 eop_load_data!("test/assets/eopc04.eop.dat", iers2010a)
 
 @testset "Full Rotation with EOP" verbose=true begin 
