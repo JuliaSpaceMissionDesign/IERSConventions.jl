@@ -1,0 +1,7 @@
+[testdata]
+git-tree-sha1 = "2f1be54be28c00854966499dfc74ee3c3d6dd702"
+lazy = true
+
+    [[testdata.download]]
+    sha256 = "78baa0ab7a28b55801d7ccfd1be1b13774817030ad701c0d3f098343378902b0"
+    url = "https://gist.github.com/MicheleCeresoli/1e8022497cfe8889d9409ef92fb112f0/raw/2f1be54be28c00854966499dfc74ee3c3d6dd702.tar.gz"

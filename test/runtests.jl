@@ -4,6 +4,7 @@ using Test
 
 using DelimitedFiles
 using ERFA 
+using LazyArtifacts
 using LinearAlgebra
 using ReferenceFrameRotations
 using RemoteFiles
@@ -23,6 +24,12 @@ let
     eop_load_data!(eopfile*".eop.dat", iers2010a)
 end;
 
+@testset "Download all artifacts" begin
+    @info artifact"testdata"
+    @info "All artifacts downloaded"
+end;
+
+
 @testset "IERSConventions" verbose=true begin 
     
     include("fa.jl")
@@ -32,6 +39,6 @@ end;
     include("polar.jl")
     include("era.jl")
 
-    # include("rotations.jl")
+    include("rotations.jl")
 
 end;
