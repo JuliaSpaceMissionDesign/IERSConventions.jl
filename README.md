@@ -13,7 +13,12 @@ The aim of this package is to provide a set of standardised functions that allow
 
 ## Installation 
 
-This package will soon be registered within Julia's general registry.
+This package can be installed using Julia's package manager: 
+```julia
+julia> import Pkg
+
+julia> Pkg.add("IERSConventions.jl");
+```
 
 ## Documentation 
 For further information on this package and its tutorials please refer to the 
