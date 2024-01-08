@@ -190,6 +190,28 @@ eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
 
     @testset "Equinox-based approach" verbose=true begin 
 
+        ep1 = convert(TT, Epoch("2000-01-01T00:00:00 UTC"))
+        ep2 = convert(TT, Epoch("2020-01-01T00:00:00 UTC"))
+        eps = ep1:86400:ep2
+    
+        # We now test that the GTOD frame obtained equals the TIRF for the IAU 2010A model.  
+        # Since we've already validated the GCRF-to-TIRF routine, we don't require external 
+        # test data for this 
+        
+        @testset "GCRF-to-GTOD" verbose=true begin 
+            for j in eachindex(eps)
+        
+                ep = eps[j]
+        
+                S1 = iers_rot3_gcrf_to_tirf(j2000s(ep_tt), iers2010a)
+                S2 = iers_rot3_gcrf_to_gtod(j2000s(ep_tt), iers2010a)
+        
+                for _ in 1:10
+                    v = rand(BigFloat, 3)
+                    @test v2as(S1*v, S2*v) ≤ 10e-6 
+                end
+            end
+        end
 
     end
 
