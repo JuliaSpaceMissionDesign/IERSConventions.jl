@@ -1,10 +1,10 @@
 
-export eop_parse_csv, eop_parse_txt
+export eop_generate_from_csv, eop_generate_from_txt
 
 """
-    eop_parse_csv(m::IERSModel, inputfile, outputfile)
+    eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
 
-Parse CSV files containing IERS EOP data and extracts the relevant information to a dedicated 
+Parse CSV files containing IERS EOP data and extract the relevant information to a dedicated 
 JSMD `.eop.dat` file. Supported formats are the EOP C04 series and the Rapid Data 
 prediction (finals).
 
@@ -26,9 +26,9 @@ prediction (finals).
 # TODO: add websites
 
 ### See also 
-See also [`eop_parse_txt`](@ref). 
+See also [`eop_generate_from_txt`](@ref). 
 """
-function eop_parse_csv(m::IERSModel, inputfile, outputfile)
+function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
 
     # Check whether the file is a Combined Series (C04) or the Rapid Data Series.
     isfinal = startswith(splitdir(inputfile)[2], "finals")
@@ -124,9 +124,9 @@ end
 
 
 """
-    eop_parse_txt(m::IERSModel, inputfile, outputfile)
+    eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
 
-Parse TXT files containing IERS EOP C04 data and extracts the relevant information to a 
+Parse TXT files containing IERS EOP C04 data and extract the relevant information to a 
 dedicated JSMD `.eop.dat` file. 
 
 !!! note 
@@ -142,9 +142,9 @@ dedicated JSMD `.eop.dat` file.
     input file name, which should be left equal to the one retrieved from the IERS website.
 
 ### See also 
-See also [`eop_parse_csv`](@ref). 
+See also [`eop_generate_from_csv`](@ref). 
 """
-function eop_parse_txt(m::IERSModel, inputfile, outputfile)
+function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
 
     # Check that the starting file pattern matches the EOPC04 nomenclature
     filename = splitdir(inputfile)[2]
@@ -231,7 +231,7 @@ Write the EOP data stored in the matrix `data` to a dedicated JSMD `.eop-dat` fi
     added by this function.  
 
 ### See also 
-See also [`eop_parse_csv`](@ref) and [`eop_parse_txt`](@ref). 
+See also [`eop_generate_from_csv`](@ref) and [`eop_generate_from_txt`](@ref). 
 """
 function eop_write_data(data, output_filename)
     writedlm(output_filename * ".eop.dat", data)

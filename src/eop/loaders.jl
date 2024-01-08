@@ -94,7 +94,7 @@ function eop_read_data(filename)
         throw(
             ArgumentError(
                 "EOP reader support only '.eop.dat' files! Please prepare " * 
-                "the data with \'eop_parse_csv\' and retry."
+                "the data with \'eop_generate_from_csv\' and retry."
             )
         )
     end
