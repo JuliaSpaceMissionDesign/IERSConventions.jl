@@ -17,18 +17,19 @@ EOP_DATA_FILE = @RemoteFile "https://datacenter.iers.org/data/csv/finals2000A.da
 
 download(EOP_DATA_FILE; verbose=true, force=false)
 
-@info "Initialise EOP data"
-let
-    eopfile = joinpath(@__DIR__, "assets", "iau2000a")
-    eop_generate_from_csv(iers2010a, path(EOP_DATA_FILE), eopfile)
-    eop_load_data!(eopfile*".eop.dat", iers2010a)
-end;
-
 @testset "Download all artifacts" begin
     @info artifact"testdata"
     @info "All artifacts downloaded"
 end;
 
+test_dir = artifact"testdata"
+
+begin 
+    @info "Initialise EOP data"
+    eopfile = joinpath(test_dir, "eopc04_20.1962-now.txt")
+    eop_generate_from_txt(iers2010a, eopfile, joinpath(@__DIR__, "assets", "eopc04"))
+    eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
+end
 
 @testset "IERSConventions" verbose=true begin 
     
