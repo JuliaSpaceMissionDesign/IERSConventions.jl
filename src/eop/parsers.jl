@@ -205,7 +205,7 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
         δΔϵ = fct*@view(data[first_row:end, idxs[7]])
 
         corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
-        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+        δX, δY = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
     end
 
     # Write the EOP data to the desired file
@@ -229,7 +229,7 @@ function parse_eop_txt_finals(inputfile)
     hascip = occursin("2000A", filename)
 
     mjd = Float64[]
-    xp, yp = Float64[], Float64[]
+    raw_xp, raw_yp = String[], String[]
 
     raw_Δut1, raw_lod = String[], String[]
     raw_c1, raw_c2 = String[], String[]
@@ -238,8 +238,8 @@ function parse_eop_txt_finals(inputfile)
     open(inputfile, "r") do f 
         for line in readlines(f)
             push!(mjd, parse(Float64, line[8:15]))
-            push!(xp, parse(Float64, line[19:27]))
-            push!(yp, parse(Float64, line[38:46]))
+            push!(raw_xp, replace(line[19:27], " " => ""))
+            push!(raw_yp, replace(line[38:46], " " => ""))
     
             push!(raw_Δut1, replace(line[59:68], " " => ""))
             push!(raw_lod, replace(line[80:86], " " => ""))
@@ -253,7 +253,7 @@ function parse_eop_txt_finals(inputfile)
     data = hcat(
         mjd, 
         fill_eop_data(raw_lod), fill_eop_data(raw_Δut1),
-        xp, yp,  
+        fill_eop_data(raw_xp), fill_eop_data(raw_yp),
         fill_eop_data(raw_c1), fill_eop_data(raw_c2)
     )
 
