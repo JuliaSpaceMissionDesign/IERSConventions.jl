@@ -90,7 +90,7 @@ function iers_rot3_gcrf_to_gtod(t::Number, m::IERSModel=iers2010b)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, ttc)
-    δΔϵ = eop_δΔϵ(m, tct)
+    δΔϵ = eop_δΔϵ(m, ttc)
 
     # Retrieve precession-bias matrix
     PB = iers_pb(m, ttc)
