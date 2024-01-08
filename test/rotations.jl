@@ -203,8 +203,8 @@ eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
         
                 ep = eps[j]
         
-                S1 = iers_rot3_gcrf_to_tirf(j2000s(ep_tt), iers2010a)
-                S2 = iers_rot3_gcrf_to_gtod(j2000s(ep_tt), iers2010a)
+                S1 = iers_rot3_gcrf_to_tirf(j2000s(ep), iers2010a)
+                S2 = iers_rot3_gcrf_to_gtod(j2000s(ep), iers2010a)
         
                 for _ in 1:10
                     v = rand(BigFloat, 3)
