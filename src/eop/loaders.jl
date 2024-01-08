@@ -121,8 +121,8 @@ function eop_read_data(filename)
 
     δX = data[:, 6]
     δY = data[:, 7]
-    δΔψ = data[:, 6]
-    δΔϵ = data[:, 7]
+    δΔψ = data[:, 8]
+    δΔϵ = data[:, 9]
 
     return days_utc, days_tt, xp, yp, ut1_tt, lod, δX, δY, δΔψ, δΔϵ
 
