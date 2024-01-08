@@ -23,7 +23,8 @@ prediction (finals).
     input filename. Thus, the filename should be kept equal to the one released by the IERS. 
 
 ### References 
-# TODO: add websites
+- [USNO finals](https://maia.usno.navy.mil/ser7/readme.finals)
+- [USNO finals 2000A](https://maia.usno.navy.mil/ser7/readme.finals2000A)
 
 ### See also 
 See also [`eop_generate_from_txt`](@ref). 
@@ -147,6 +148,10 @@ prediction (finals).
 !!! warning 
     This routine recognises the file structure and column ordering by analysing the 
     input file name, which should be left equal to the one retrieved from the IERS website.
+
+### References 
+- [USNO finals](https://maia.usno.navy.mil/ser7/readme.finals)
+- [USNO finals 2000A](https://maia.usno.navy.mil/ser7/readme.finals2000A)
 
 ### See also 
 See also [`eop_generate_from_csv`](@ref). 
@@ -326,12 +331,16 @@ function fill_eop_data(raw_data)
     isnothing(lrow) && return data 
 
     # Fill the missing elements with the latest available data
-    data[1:lrow] = parse.(Float64, raw_data[1:lrow])
-    data[lrow+1:end] .= parse(Float64, raw_data[lrow])
+    data[1:lrow] = _to_float.(raw_data[1:lrow])
+    data[lrow+1:end] .= _to_float(raw_data[lrow])
     
     return data 
 
 end
+
+_to_float(x::AbstractString) = parse(Float64, x)
+_to_float(x::Number) = x
+
 
 
 # EOP Conversion functions 
