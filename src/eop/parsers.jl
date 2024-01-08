@@ -132,8 +132,9 @@ end
 """
     eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
 
-Parse TXT files containing IERS EOP C04 data and extract the relevant information to a 
-dedicated JSMD `.eop.dat` file. 
+Parse TXT files containing IERS EOP data and extract the relevant information to a dedicated 
+JSMD `.eop.dat` file. Supported formats are the EOP C04 series and the Rapid Data 
+prediction (finals).
 
 !!! note 
     The `outputfile` name should not include the file extension, which is automatically 
@@ -152,32 +153,20 @@ See also [`eop_generate_from_csv`](@ref).
 """
 function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
 
-    # Check that the starting file pattern matches the EOPC04 nomenclature
+    # Check that the starting file pattern matches the EOPC04 or finals nomenclature
     filename = splitdir(inputfile)[2]
-    if !startswith(filename, "eopc04")
-        throw(ArgumentError("Unsupported EOP C04 filename!"))
-    end
-
-    # Retrieve ITRF version
-    itrfv = parse(Int, filename[8:9])
-    if itrfv == 14 
-
-        hascip = occursin("IAU2000", filename)
-        idxs = [4, 8, 7, 5, 6, 9, 10]
-
-        # In this version, the EOP data starts at the 15th row
-        data = readdlm(inputfile; header=false, skipstart=14)
-
-    elseif itrfv == 20 
+    if startswith(filename, "eopc04")
+        data, idxs, hascip = parse_eop_txt_c04(inputfile)
+        fct = 1.0
+    elseif startswith(filename, "finals")
+        data, idxs, hascip = parse_eop_txt_finals(inputfile)
         
-        hascip = true
-        idxs = [5, 13, 8, 6, 7, 9, 10]
-        
-        # Parse the data file. In this version, the header is completely commented
-        data = readdlm(inputfile; header=false, comments=true)
-
+        # Multiplicative factor to bring all quantities to seconds/arcseconds, since in the 
+        # rapid data series the LOD is given in milliseconds, and the dX, dY, dPsi and dEps 
+        # corrections are in milliarcseconds. 
+        fct = 1e-3
     else 
-        throw(ArgumentError("Unsupported ITRF version."))
+        throw(ArgumentError("Unable to recognise EOP filename pattern."))
     end
 
     # In this case we don't have issues of missing data. Thus we convert everything. 
@@ -188,7 +177,7 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
     mjd_1972  = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
     first_row = findfirst(x -> x >= mjd_1972, mjd)
 
-    lod = @view(data[first_row:end, idxs[2]])
+    lod = fct*@view(data[first_row:end, idxs[2]])
     Δut1 = @view(data[first_row:end, idxs[3]])
 
     # Convert UTC days to TT centuries (for the correction conversion)
@@ -201,19 +190,19 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
     yp = @view(data[first_row:end, idxs[5]])
 
     k = π/648000
-        
+
     # Retrieve the CIP and nutation corrections
     if hascip
-        δX = @view(data[first_row:end, idxs[6]])
-        δY = @view(data[first_row:end, idxs[7]])
+        δX = fct*@view(data[first_row:end, idxs[6]])
+        δY = fct*@view(data[first_row:end, idxs[7]])
 
         # Convert CIP into nutation corrections 
         corr = map((t, dx, dy)->δcip_to_δnut(m, t, dx*k, dy*k), cent_tt, δX, δY)
         δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
 
     else 
-        δΔψ = @view(data[first_row:end, idxs[6]])
-        δΔϵ = @view(data[first_row:end, idxs[7]])
+        δΔψ = fct*@view(data[first_row:end, idxs[6]])
+        δΔϵ = fct*@view(data[first_row:end, idxs[7]])
 
         corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
         δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
@@ -228,6 +217,80 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
         ), 
         outputfile
     )
+
+end
+
+function parse_eop_txt_finals(inputfile)
+
+    # Retrieve the filename
+    filename = splitdir(inputfile)[2]
+    
+    # Check whether it contains nutation or CIP corrections
+    hascip = occursin("2000A", filename)
+
+    mjd = Float64[]
+    xp, yp = Float64[], Float64[]
+
+    raw_Δut1, raw_lod = String[], String[]
+    raw_c1, raw_c2 = String[], String[]
+
+    # Parse each line one by one and extract the data
+    open(inputfile, "r") do f 
+        for line in readlines(f)
+            push!(mjd, parse(Float64, line[8:15]))
+            push!(xp, parse(Float64, line[19:27]))
+            push!(yp, parse(Float64, line[38:46]))
+    
+            push!(raw_Δut1, replace(line[59:68], " " => ""))
+            push!(raw_lod, replace(line[80:86], " " => ""))
+    
+            push!(raw_c1, replace(line[98:106], " " => ""))
+            push!(raw_c2, replace(line[117:125], " " => ""))
+        end
+    end
+
+    # Assemble a dummy Float64 matrix to store the parsed data
+    data = hcat(
+        mjd, 
+        fill_eop_data(raw_lod), fill_eop_data(raw_Δut1),
+        xp, yp,  
+        fill_eop_data(raw_c1), fill_eop_data(raw_c2)
+    )
+
+    idxs = [1, 2, 3, 4, 5, 6, 7]
+
+    return data, idxs, hascip
+
+end
+
+function parse_eop_txt_c04(inputfile)
+    
+    # Retrieve the filename
+    filename = splitdir(inputfile)[2]
+
+    # Retrieve ITRF version
+    itrfv = parse(Int, filename[8:9])
+    if itrfv == 14 
+
+        hascip = occursin("IAU2000", filename)
+        idxs = [4, 8, 7, 5, 6, 9, 10]
+
+        # In this version, the EOP data starts at the 15th row
+        data = readdlm(inputfile; header=false, skipstart=14)
+
+    elseif itrfv == 20 
+
+        hascip = true
+        idxs = [5, 13, 8, 6, 7, 9, 10]
+        
+        # Parse the data file. In this version, the header is completely commented
+        data = readdlm(inputfile; header=false, comments=true)
+
+    else 
+        throw(ArgumentError("Unsupported ITRF version."))
+    end
+    
+    return data, idxs, hascip 
 
 end
 
@@ -263,8 +326,8 @@ function fill_eop_data(raw_data)
     isnothing(lrow) && return data 
 
     # Fill the missing elements with the latest available data
-    data[1:lrow] = raw_data[1:lrow]
-    data[lrow+1:end] .= raw_data[lrow]
+    data[1:lrow] = parse.(Float64, raw_data[1:lrow])
+    data[lrow+1:end] .= parse(Float64, raw_data[lrow])
     
     return data 
 
