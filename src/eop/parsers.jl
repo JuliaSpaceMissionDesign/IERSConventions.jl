@@ -107,7 +107,7 @@ function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
         δΔϵ = fct*fill_eop_data(raw_δΔϵ)
     
         corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
-        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+        δX, δY = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
     end
     
     # Write the EOP data to the desired file
