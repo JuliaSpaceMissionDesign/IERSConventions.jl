@@ -316,6 +316,9 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
         @test repr(IERSConventions.IERS_EOP_DATA) == "EOPData()\n"
         @test repr(IERSConventions.IERS_EOP) == "EOPInterpolator(init=false)\n"
 
+        dummy_eop = joinpath(test_dir, "eop", "txt", "finals.data")
+        @test_throws ArgumentError eop_load_data!(dummy_eop, iers2010a)
+
         @info "Initialising EOP data"
         eop_file = joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat")
         eop_load_data!(eop_file, iers2010a)
