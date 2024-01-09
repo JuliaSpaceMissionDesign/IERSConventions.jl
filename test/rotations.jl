@@ -5,12 +5,11 @@ test_dir = artifact"testdata"
 r2a = 180 / π * 3600
 v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
-# With that epoch lists, retrieve all the required EOP data 
-eopfile = joinpath(test_dir, "eop", "txt", "eopc04_20.1962-now.txt")
-eop_generate_from_txt(iers2010a, eopfile, joinpath(@__DIR__, "assets", "eopc04"))
-eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
 
 @testset "Rotations" verbose=true begin 
+
+    # Load EOP data
+    eop_load_data!(joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat"), iers2010a)
 
     @testset "CIO-based approach" verbose=true begin 
         @testset "CIRF-to-GCRF" verbose=true begin 
@@ -192,16 +191,103 @@ eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
 
         ep1 = convert(TT, Epoch("2000-01-01T00:00:00 UTC"))
         ep2 = convert(TT, Epoch("2020-01-01T00:00:00 UTC"))
-        eps = ep1:86400:ep2
+        epochs = ep1:86400:ep2
+
+        # To test the next rotations, we are using data retrieved from the matrix 
+        # calculator available on the USNO website, which allows to retrieve the 
+        # rotations for the TN36 Equinox-based approach.
+
+        # The EOP data is retrieved from the finals2000A file available at this epoch:
+        # 2024-01-09T21:00:00 UTC 
+        eop_load_data!(joinpath(@__DIR__, "assets", "finals2000A.data.eop.dat"), iers2010a)
+
+        # Since the USNO matrix calculator does not return matrices with fixed absolute 
+        # accuracy (it always displays the coefficients in scientific notation with 9 
+        # decimals), we are not able to test the rotation accuracy up to 1μas tolerances 
+        # for all epochs. The epoch here select minimises the value of GAST, thus the small 
+        # values of the coefficients allow to test the rotations to higher absolute 
+        # tolerances! 
+
+        ep_utc = Epoch("2009-09-21T00:00:00 UTC")
+        ep_tt = convert(TT, ep_utc)
+
+        tt_s = j2000s(ep_tt)
+
+        # Bias matrix (from EME2000 to ICRF)
+        B = [ 1.00000000e+00  7.07836869e-08 -8.05621421e-08;
+             -7.07836896e-08  1.00000000e+00 -3.30594317e-08;
+              8.05621398e-08  3.30594374e-08  1.00000000e+00];
+            
+        # Precession matrix (from MOD to EME2000)
+        P = [ 9.99997192e-01  2.17365687e-03  9.44504641e-04;
+             -2.17365686e-03  9.99997638e-01 -1.03863700e-06;
+             -9.44504667e-04 -1.01439491e-06  9.99999554e-01];
+
+        # Bias-Precession-Nutation (from TOD to ICRF)
+        BPN = [ 9.99997017e-01  2.24017957e-03  9.73295316e-04; 
+               -2.24020240e-03  9.99997490e-01  2.23662098e-05;
+               -9.73242769e-04 -2.45465216e-05  9.99999526e-01];
+
+        # GAST matrix (from GTOD to TOD)
+        GA = [9.99999994e-01 -1.09254238e-04  0.00000000e+00;
+              1.09254238e-04  9.99999994e-01  0.00000000e+00;
+              0.00000000e+00  0.00000000e+00  1.00000000e+00];
     
-        # We now test that the GTOD frame obtained equals the TIRF for the IAU 2010A model.  
-        # Since we've already validated the GCRF-to-TIRF routine, we don't require external 
-        # test data for this 
+        @testset "GCRF-to-MOD" verbose=true begin
         
+            M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
+            Mex = (B*P)'
+
+            @test abs(Mex[1, 1] - M[1, 1]) ≤ 1e-9
+            @test abs(Mex[2, 2] - M[2, 2]) ≤ 1e-9 
+            @test abs(Mex[3, 3] - M[3, 3]) ≤ 1e-10
+
+            @test abs(Mex[1, 2] - M[1, 2]) ≤ 1e-12
+            @test abs(Mex[1, 3] - M[1, 3]) ≤ 1e-12
+            @test abs(Mex[2, 1] - M[2, 1]) ≤ 1e-12
+            @test abs(Mex[2, 3] - M[2, 3]) ≤ 1e-12
+            @test abs(Mex[3, 2] - M[3, 2]) ≤ 1e-12
+
+        end 
+
+        @testset "GCRF-to-TOD" verbose=true begin 
+            
+            T = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
+            Tex = BPN'
+
+            @test abs(Tex[1, 1] - T[1, 1]) ≤ 1e-9
+            @test abs(Tex[2, 2] - T[2, 2]) ≤ 1e-9 
+            @test abs(Tex[3, 3] - T[3, 3]) ≤ 1e-10
+
+            @test abs(Tex[1, 2] - T[1, 2]) ≤ 1e-12
+            @test abs(Tex[1, 3] - T[1, 3]) ≤ 1e-12
+            @test abs(Tex[2, 1] - T[2, 1]) ≤ 1e-12
+            @test abs(Tex[2, 3] - T[2, 3]) ≤ 1e-12
+            @test abs(Tex[3, 2] - T[3, 2]) ≤ 1e-12
+
+        end
+
         @testset "GCRF-to-GTOD" verbose=true begin 
-            for j in eachindex(eps)
+
+            G = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
+            Gex = GA'*BPN'
+
+            @test abs(Gex[1, 1] - G[1, 1]) ≤ 1e-9
+            @test abs(Gex[2, 2] - G[2, 2]) ≤ 1e-9 
+            @test abs(Gex[3, 3] - G[3, 3]) ≤ 1e-10
+
+            @test abs(Gex[1, 2] - G[1, 2]) ≤ 1e-11
+            @test abs(Gex[1, 3] - G[1, 3]) ≤ 1e-12
+            @test abs(Gex[2, 1] - G[2, 1]) ≤ 1e-11
+            @test abs(Gex[2, 3] - G[2, 3]) ≤ 1e-12
+            @test abs(Gex[3, 2] - G[3, 2]) ≤ 1e-12
+
+            # We now test that the GTOD frame obtained equals the TIRF for the IAU 2010A 
+            # model. Since we've already validated the GCRF-to-TIRF routine, we don't 
+            # need other external test data for this 
+            for j in eachindex(epochs)
         
-                ep = eps[j]
+                ep = epochs[j]
         
                 S1 = iers_rot3_gcrf_to_tirf(j2000s(ep), iers2010a)
                 S2 = iers_rot3_gcrf_to_gtod(j2000s(ep), iers2010a)
@@ -211,8 +297,109 @@ eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
                     @test v2as(S1*v, S2*v) ≤ 10e-6 
                 end
             end
+
         end
+
+        # Now that we have evaluated the rotations from the GCRF, we can indirectly 
+        # test the ones that start from the ITRF at multiple epochs
+        F = DCM{Float64}[]
+        for j in eachindex(epochs)
+            push!(F, iers_rot3_gcrf_to_itrf(j2000s(epochs[j]), iers2010a))
+        end
+
+        @testset "ITRF-to-MOD" verbose=true begin 
+            
+            for j in eachindex(epochs)
+
+                v_g = rand(BigFloat, 3)
+                v_i = F[j]*v_g; v_i /= norm(v_i)
+
+                tt_s = j2000s(epochs[j])
+
+                S1 = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
+                S2 = iers_rot3_itrf_to_mod(tt_s, iers2010a)
+
+                @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
+
+            end
+
+        end
+
+        @testset "ITRF-to-TOD" verbose=true begin 
+
+            for j in eachindex(epochs)
+
+                v_g = rand(BigFloat, 3)
+                v_i = F[j]*v_g; v_i /= norm(v_i)
+
+                tt_s = j2000s(epochs[j])
+
+                S1 = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
+                S2 = iers_rot3_itrf_to_tod(tt_s, iers2010a)
+
+                @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
+
+            end
+
+        end
+
+        @testset "ITRF-to-GTOD" verbose=true begin 
+
+            for j in eachindex(epochs)
+
+                v_g = rand(BigFloat, 3)
+                v_i = F[j]*v_g; v_i /= norm(v_i)
+
+                tt_s = j2000s(epochs[j])
+
+                S1 = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
+                S2 = iers_rot3_itrf_to_gtod(tt_s, iers2010a)
+
+                @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
+
+            end
+        end
+
 
     end
 
 end;
+
+
+# ep_utc = Epoch("2009-09-21T00:00:00 UTC")
+# ep_tt = convert(TT, ep_utc)
+
+# tt_s = j2000s(ep_tt)
+
+# # Bias matrix
+# B = [ 1.00000000e+00  7.07836869e-08 -8.05621421e-08;
+#      -7.07836896e-08  1.00000000e+00 -3.30594317e-08;
+#       8.05621398e-08  3.30594374e-08  1.00000000e+00];
+    
+# # Precession matrix 
+# P = [ 9.99997192e-01  2.17365687e-03  9.44504641e-04;
+#      -2.17365686e-03  9.99997638e-01 -1.03863700e-06;
+#      -9.44504667e-04 -1.01439491e-06  9.99999554e-01];
+
+# M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
+# M - (B*P)'
+
+# T = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
+# Tex = BPN'
+
+# T - Tex
+
+
+# G = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
+
+# begin 
+# Gex = (GA'*BPN')
+# G-Gex
+# end 
+
+# @testset "GCRF-to-MOD" verbose=true begin
+
+#     M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
+#     M - (P*B)'
+
+# end 
