@@ -5,10 +5,6 @@ r2a = 180 / π * 3600
 
     for _ in 1:50 
 
-        # TODO: for these tests we currently assume that the 
-        # offset between UTC and UT1 is null! It will have to be 
-        # changed once we thrown in the actual EOP values!
-
         tt_c = rand()/4
         tt_d = tt_c*Tempo.CENTURY2DAY
 
