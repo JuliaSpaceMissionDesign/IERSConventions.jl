@@ -94,6 +94,7 @@ iers_polar_motion
 ```@docs 
 eop_filename
 eop_load_data! 
+eop_unload_data!
 eop_generate_from_csv 
 eop_generate_from_txt
 ```

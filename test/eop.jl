@@ -322,7 +322,14 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
         @info "Initialising EOP data"
         eop_file = joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat")
         eop_load_data!(eop_file, iers2010a)
-        
+
+        # Test unloading of EOP data 
+        eop_unload_data!()
+
+        @test_throws ErrorException eop_filename()
+        @test_throws ErrorException IERSConventions.eop_δX(iers2010a, 0)
+
+        eop_load_data!(eop_file, iers2010a)
         @test eop_filename() == eop_file 
     end
 

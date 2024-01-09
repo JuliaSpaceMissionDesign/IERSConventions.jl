@@ -1,5 +1,5 @@
 
-export eop_load_data!
+export eop_load_data!, eop_unload_data!
 
 """
     eop_load_data!(filename, m::IERS2010)
@@ -36,6 +36,24 @@ function eop_load_data!(filename, m::IERS2010)
     IERS_EOP.nut2010 = nci2010
 
     @info "EOP initialised from file `$(filename)`."
+    nothing 
+
+end
+
+""" 
+    eop_unload_data!()
+
+Unload all the EOP data that has been loaded during the session. 
+"""
+function eop_unload_data!()
+    
+    # Here we are not actually removing the data from the EOP data structures, 
+    # but we still make sure that the parameters that are used to verify whether 
+    # there is available EOP data are set to false. 
+
+    IERS_EOP_DATA.filename = ""
+    IERS_EOP.init = false
+    
     nothing 
 
 end
