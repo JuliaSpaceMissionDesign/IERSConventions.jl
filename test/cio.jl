@@ -32,10 +32,6 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         @test r2a*abs(xe-x) ≤ 3e-4 
         @test r2a*abs(ye-y) ≤ 3e-4
         
-
-        # TODO: test on cio locator is missing
-
-
         # CIP vector 
         cip = cip_vector(iers1996, tt_c)
         @test r2a*abs(cip[1] - xe)      ≤ 15e-3
