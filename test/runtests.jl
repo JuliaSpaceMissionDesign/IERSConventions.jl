@@ -17,17 +17,10 @@ using Tempo
     @info "All artifacts downloaded"
 end;
 
-test_dir = artifact"testdata"
-
-begin 
-    @info "Initialising EOP data"
-    eopfile = joinpath(test_dir, "eop", "txt", "eopc04_20.1962-now.txt")
-    eop_generate_from_txt(iers2010a, eopfile, joinpath(@__DIR__, "assets", "eopc04"))
-    eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
-end
-
 @testset "IERSConventions" verbose=true begin 
-    
+
+    include("eop.jl")
+
     include("fa.jl")
     include("bpn.jl")
     include("cio.jl")
@@ -35,7 +28,6 @@ end
     include("polar.jl")
     include("era.jl")
 
-    include("eop.jl")
     include("rotations.jl")
 
     include("parsers.jl")

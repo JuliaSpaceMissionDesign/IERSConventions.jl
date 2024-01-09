@@ -305,6 +305,22 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
             @test abs(data5[row, 9] - 1e-3*-2.140) ≤ 1e-6
 
         end
-
     end
+
+    @testset "Miscellaneous" verbose=true begin 
+
+        # Test that if no EOP data has been loaded, we get errors! 
+        @test_throws ErrorException eop_filename()
+        @test_throws ErrorException IERSConventions.eop_δX(iers2010a, 0)
+
+        @test repr(IERSConventions.IERS_EOP_DATA) == "EOPData()\n"
+        @test repr(IERSConventions.IERS_EOP) == "EOPInterpolator(init=false)\n"
+
+        @info "Initialising EOP data"
+        eop_file = joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat")
+        eop_load_data!(eop_file, iers2010a)
+        
+        @test eop_filename() == eop_file 
+    end
+
 end;
