@@ -109,7 +109,7 @@ end
 """
     cio_locator(m::IERSModel, t::Number, x::Number, y::Number)
 
-Compute the CIO locator `s`, in radians, following the IERS Conventions `m' at time `t`, 
+Compute the CIO locator `s`, in radians, following the IERS Conventions `m` at time `t`, 
 expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` and `y`.
 
 ### References 
