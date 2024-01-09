@@ -331,6 +331,10 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
 
         eop_load_data!(eop_file, iers2010a)
         @test eop_filename() == eop_file 
+
+        str = "EOPData(filename=\"$eop_file\", from: -10227.5 (UTC) to 8741.5 (UTC))\n"
+        @test repr(IERSConventions.IERS_EOP_DATA) == str
+
     end
 
 end;

@@ -76,8 +76,8 @@ function Base.show(io::IO, eop::EOPData)
     else 
         println(
             io, 
-            "EOPData(filename=\"$(eop.filename), \"beg=\"$(eop.days_UTC[1]) (UTC)\", "* 
-            "end=\"$(eop.days_UTC[end]) (UTC)\")"
+            "EOPData(filename=\"$(eop.filename)\", from: $(eop.days_UTC[1]) (UTC) to "* 
+            "$(eop.days_UTC[end]) (UTC))"
         )
     end 
 
