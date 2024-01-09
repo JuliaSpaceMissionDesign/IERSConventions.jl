@@ -124,13 +124,13 @@ eop_yp(::CPND, ::Number) = 0
 
 
 """
-    offset_tt2ut1(tt_c::Number)
+    offset_tt2ut1(tt_s::Number)
 
-Return the TT-to-UT1 offset, in seconds, at `tt_c` expressed in TT seconds since J2000.
+Return the TT-to-UT1 offset, in seconds, at `tt_s` expressed in TT seconds since J2000.
 """
-function offset_tt2ut1(tt_c)
+function offset_tt2ut1(tt_s)
     eop_check_init()
-    return interpolate(IERS_EOP.ut1_tt, tt_c/Tempo.CENTURY2SEC)
+    return interpolate(IERS_EOP.ut1_tt, tt_s/Tempo.CENTURY2SEC)
 end
 
 
