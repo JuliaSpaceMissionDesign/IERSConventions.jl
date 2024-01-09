@@ -6,7 +6,7 @@ r2a = 180 / π * 3600
 v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
 # With that epoch lists, retrieve all the required EOP data 
-eopfile = joinpath(test_dir, "eop", "eopc04_20.1962-now.txt")
+eopfile = joinpath(test_dir, "eop", "txt", "eopc04_20.1962-now.txt")
 eop_generate_from_txt(iers2010a, eopfile, joinpath(@__DIR__, "assets", "eopc04"))
 eop_load_data!(joinpath(@__DIR__, "assets", "eopc04.eop.dat"), iers2010a)
 
