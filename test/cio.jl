@@ -4,6 +4,19 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
 @testset "CIP" verbose=true begin 
 
+    # Since ERFA does not have any functions to compute the CIO locator for the
+    # 1996 model, we are using orekit v. 12.0 to do so. The CIO locator has been 
+    # manually computed at a specific reference epoch: 
+    
+    ep = Epoch("2020-01-01T00:00:00 TT")
+    _, _, s = cip_xys(iers1996, j2000c(ep))
+
+    x_orekit = 0.0019113852308519795   # rad 
+    y_orekit = -1.2481442641203027e-05 # rad 
+    s_orekit = -1.152831476799726e-08 - x_orekit*y_orekit/2
+
+    @test r2a*(s - s_orekit) ≤ 1e-6
+
     for _ in 1:50
 
         tt_c = rand()
@@ -19,7 +32,9 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         @test r2a*abs(xe-x) ≤ 3e-4 
         @test r2a*abs(ye-y) ≤ 3e-4
         
+
         # TODO: test on cio locator is missing
+
 
         # CIP vector 
         cip = cip_vector(iers1996, tt_c)
