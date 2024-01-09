@@ -162,7 +162,7 @@ function cio_locator(m::IERS1996, t::Number, x::Number, y::Number)
     sA = sin(2*(d.F - d.D + d.Ω))
 
     # Compute the polynomial and harmonic parts 
-    sp = @evalpoly(t, 0, 0.00385, -0.07259)
+    sp = @evalpoly(t, 0, 0.00385, 0, -0.07259)
     sh = -0.00264*sΩ - 0.00006*sin(2*d.Ω) + t^2*(0.00074*sΩ + 0.00006*sA)
 
     return arcsec2rad(sp + sh) - x*y/2
