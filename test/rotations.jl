@@ -279,9 +279,9 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                 S3 = iers_rot3_gcrf_to_tod(tt_s, CPNc)
                 S4 = iers_rot3_gcrf_to_tod(tt_s, CPNd)
     
-                @test v2as(S1*v_g, S2*v_g) ≤ 3e-3
-                @test v2as(S1*v_g, S3*v_g) ≤ 50e-3
-                @test v2as(S1*v_g, S4*v_g) ≤ 1
+                @test v2as(S1*v, S2*v) ≤ 3e-3
+                @test v2as(S1*v, S3*v) ≤ 50e-3
+                @test v2as(S1*v, S4*v) ≤ 1
 
             end
 
@@ -322,9 +322,9 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                 S4 = iers_rot3_gcrf_to_gtod(tt_s, CPNc)
                 S5 = iers_rot3_gcrf_to_gtod(tt_s, CPNd)
 
-                @test v2as(S2*v_g, S3*v_g) ≤ 3e-3
-                @test v2as(S2*v_g, S4*v_g) ≤ 50e-3
-                @test v2as(S2*v_g, S5*v_g) ≤ 1
+                @test v2as(S2*v, S3*v) ≤ 3e-3
+                @test v2as(S2*v, S4*v) ≤ 50e-3
+                @test v2as(S2*v, S5*v) ≤ 1
 
             end
 
