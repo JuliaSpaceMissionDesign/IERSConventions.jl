@@ -155,7 +155,7 @@ the Pseudo-Earth Fixed (PEF) at time `t`, expressed in TT seconds since `J2000`.
 ## See also 
 See also [`iers_rot3_gcrf_to_pef`](@ref).
 """
-function iers_rot3_itrf_to_pef(t::Number, ::IERSModel=iers2010b)
+function iers_rot3_itrf_to_pef(t::Number, m::IERSModel=iers2010b)
 
     ttc = t/Tempo.CENTURY2SEC
 
@@ -222,7 +222,7 @@ function iers_rot3_itrf_to_tod(t::Number, m::IERSModel=iers2010b)
     δΔψ = eop_δΔψ(m, ttc)
 
     # Compute ITRF to GTOD rotation 
-    W = iers_rot3_itrf_to_gtod(m, t)
+    W = iers_rot3_itrf_to_gtod(t, m)
 
     # Compute GTOD to TOD rotation matrix 
     R = angle_to_dcm(-iers_gast(m, ttc, δΔψ), :Z)
@@ -249,7 +249,7 @@ function iers_rot3_itrf_to_mod(t::Number, m::IERSModel=iers2010b)
     ttc = t/Tempo.CENTURY2SEC
 
     # Compute ITRF to GTOD rotation 
-    W = iers_rot3_itrf_to_gtod(m, t)
+    W = iers_rot3_itrf_to_gtod(t, m)
 
     # Retrieve the EOP corrections to the nutation in longitude and obliquity
     δΔψ = eop_δΔψ(m, ttc)
