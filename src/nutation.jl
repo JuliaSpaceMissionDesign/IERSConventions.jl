@@ -3,10 +3,10 @@ export iers_nutation, iers_nutation_comp
 
 
 """
-    iers_nutation(m::IERSModel, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+    iers_nutation(m::IERSModel, tt_c::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
 Compute the nutation matrix that rotates a vector from Mean-of-Date (MOD) to True-of-Date 
-(TOD) axes following the IERS convention `m`, at time `t` expressed in `TT` Julian 
+(TOD) axes following the IERS convention `m`, at time `tt_c` expressed in `TT` Julian 
 Centuries since `J2000`. 
 
 Optional EOP nutation corrections can be provided via the `δΔψ` and `δΔϵ` parameters.
@@ -18,13 +18,13 @@ Optional EOP nutation corrections can be provided via the `δΔψ` and `δΔϵ` 
 ### See also 
 See also [`iers_nutation_comp`](@ref) and [`iers_obliquity`](@ref). 
 """
-function iers_nutation(m::IERSModel, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_nutation(m::IERSModel, tt_c::Number, δΔψ::Number=0, δΔϵ::Number=0)
     
     # Compute mean obliquity at epoch 
-    ϵₐ = iers_obliquity(m, t)
+    ϵₐ = iers_obliquity(m, tt_c)
 
     # Compute nutation in longitude and obliquity 
-    Δψ, Δϵ = iers_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, tt_c)
 
     # Compute nutation matrix with EOP corrections
     return angle_to_dcm(ϵₐ, - (Δψ + δΔψ), - (ϵₐ + Δϵ + δΔϵ), :XZX)
@@ -33,10 +33,10 @@ end
 
 
 """
-    iers_nutation_comp(m::IERSModel, t::Number)
+    iers_nutation_comp(m::IERSModel, tt_c::Number)
 
 Compute the nutation components in longitude and obliquity for the IERS convention `m`, in 
-radians, at time `t` expressed in `TT` Julian Centuries since `J2000`.
+radians, at time `tt_c` expressed in `TT` Julian Centuries since `J2000`.
 
 !!! note 
     For the **IAU 2006A** model, the function strictly follows the SOFA implementation. It 
@@ -77,13 +77,14 @@ iers_nutation_comp
 # 1996 CONVENTIONS
 # ============================
 
-function iers_nutation_comp(m::IERS1996, t::Number)
+function iers_nutation_comp(m::IERS1996, tt_c::Number)
     
     # Compute Delaunay's arguments 
-    dargs = DelaunayArgs(m, t)
+    dargs = DelaunayArgs(m, tt_c)
 
     # Compute the nutation components in longitude and obliquity
-    Δψ, Δϵ = _nut_components(m, t, dargs)
+    Δψ, Δϵ = _nut_components(m, tt_c, dargs)
+    return Δψ, Δϵ
 
 end
 
@@ -98,27 +99,27 @@ build_series(
 # 2003 CONVENTIONS
 # ============================
 
-function iers_nutation_comp(m::IERS2003A, t::Number)
+function iers_nutation_comp(m::IERS2003A, tt_c::Number)
 
     # Compute Delaunay's arguments 
-    dargs = DelaunayArgs(m, t)
+    dargs = DelaunayArgs(m, tt_c)
 
     # Compute Planetary's arguments 
-    pargs = PlanetaryArgs(m, t)
+    pargs = PlanetaryArgs(m, tt_c)
 
     # Compute the nutation components in longitude and obliquity
-    Δψ, Δϵ = _nut_components(m, t, dargs, pargs)
+    Δψ, Δϵ = _nut_components(m, tt_c, dargs, pargs)
     return Δψ, Δϵ
 
 end
 
-function iers_nutation_comp(m::IERS2003B, t::Number)
+function iers_nutation_comp(m::IERS2003B, tt_c::Number)
 
     # Compute Delaunay's arguments 
-    dargs = DelaunayArgs(m, t)
+    dargs = DelaunayArgs(m, tt_c)
 
     # Compute the nutation components
-    Δψ_ls, Δϵ_ls = _nut_components(m, t, dargs) 
+    Δψ_ls, Δϵ_ls = _nut_components(m, tt_c, dargs) 
 
     # Add the offeset to account for the truncated planetary contributions 
     δψ_pl = arcsec2rad(-0.135 * 1e-3)
@@ -142,14 +143,14 @@ build_series(
 # 2010 CONVENTIONS
 # ============================
 
-function iers_nutation_comp(::IERS2010A, t::Number)
+function iers_nutation_comp(::IERS2010A, tt_c::Number)
 
     # Computes IAU 2000A nutation components from luni-solar 
     # and planetary terms of the Mathews et al. (2002) series
-    Δψₐ, Δϵₐ = iers_nutation_comp(iers2003a, t)
+    Δψₐ, Δϵₐ = iers_nutation_comp(iers2003a, tt_c)
 
     # Factor correcting the secular variation of J2 
-    fj2 = -2.7774e-6 * t # t = TT 
+    fj2 = -2.7774e-6 * tt_c # t = TT 
 
     # Applies P03 Nutation Corrections from WC06 (2006)
     Δψ = (1 + fj2 + 0.4697e-6) * Δψₐ
@@ -160,18 +161,18 @@ function iers_nutation_comp(::IERS2010A, t::Number)
 
 end
 
-iers_nutation_comp(::IERS2010B, t) = iers_nutation_comp(iers2003b, t)
+iers_nutation_comp(::IERS2010B, tt_c) = iers_nutation_comp(iers2003b, tt_c)
 
-function iers_nutation_comp(m::CPNC, t::Number)
+function iers_nutation_comp(m::CPNC, tt_c::Number)
 
     # Compute CIP coordinates
-    x, y = cip_xy(m, t)
+    x, y = cip_xy(m, tt_c)
     
     # Compute mean obliquity at epoch 
-    ϵₐ = iers_obliquity(m, t)
+    ϵₐ = iers_obliquity(m, tt_c)
 
     # Compute the precession angles 
-    ϵ₀, ψₐ, ωₐ, _ = precession_angles_rot4(m, t)
+    ϵ₀, ψₐ, ωₐ, _ = precession_angles_rot4(m, tt_c)
     se, ce = sincos(ϵ₀)
 
     # Frame bias quantities
@@ -191,13 +192,13 @@ function iers_nutation_comp(m::CPNC, t::Number)
 
 end
 
-function iers_nutation_comp(m::CPND, t::Number)
+function iers_nutation_comp(m::CPND, tt_c::Number)
 
     # Compute CIP coordinates 
-    x, y = cip_xy(m, t)
+    x, y = cip_xy(m, tt_c)
 
     # Retrieve precession angles 
-    ϵ₀, ψₐ, _, _ = precession_angles_rot4(m, t)
+    ϵ₀, ψₐ, _, _ = precession_angles_rot4(m, tt_c)
     se, ce = sincos(ϵ₀)
 
     # Compute nutation in longitude and obliquity

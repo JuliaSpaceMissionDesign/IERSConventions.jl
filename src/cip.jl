@@ -2,9 +2,9 @@
 export iers_cip_motion, cip_xy, cip_xys, cip_vector
 
 """
-    iers_cip_motion(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
+    iers_cip_motion(m::IERSModel, tt_c::Number, δX::Number=0, δY::Number=0)
 
-Compute the GCRF-to-CIRF rotation matrix, following the IERS Conventions `m`, at time `t` 
+Compute the GCRF-to-CIRF rotation matrix, following the IERS Conventions `m`, at time `tt_c` 
 expressed in `TT` Julian centuries since J2000. Optional IERS EOP corrections for free-core 
 nutation and time dependent effects can be provided via `δX` and `δY`
 
@@ -14,10 +14,10 @@ nutation and time dependent effects can be provided via `δX` and `δY`
 ### See also 
 See also [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
-function iers_cip_motion(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
+function iers_cip_motion(m::IERSModel, tt_c::Number, δX::Number=0, δY::Number=0)
 
     # Compute CIP coordinates 
-    X, Y, s = cip_xys(m, t, δX, δY)
+    X, Y, s = cip_xys(m, tt_c, δX, δY)
 
     # Form intermediate-to-celestial matrix 
     return xys2m(X, Y, s)
@@ -26,10 +26,10 @@ end
 
 
 """
-    cip_xy(m::IERSModel, t::Number)
+    cip_xy(m::IERSModel, tt_c::Number)
 
 Compute the CIP X and Y coordinates, in radians, following the IERS Conventions `m`, at 
-time `t`, expressed in `TT` Julian centuries since J2000.
+time `tt_c`, expressed in `TT` Julian centuries since J2000.
 
 !!! warning 
     The computation of the free-core nutation and time dependent effects are excluded from 
@@ -50,10 +50,10 @@ cip_xy
 
 
 """
-    cip_xys(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
+    cip_xys(m::IERSModel, tt_c::Number, δX::Number=0, δY::Number=0)
 
 Compute the CIP X, Y and CIO locator s coordinates, in radians, following the IERS 
-conventions `m` at time `t`, expressed in `TT` Julian centuries since J2000. Optional EOP 
+conventions `m` at time `tt_c`, expressed in `TT` Julian centuries since J2000. Optional EOP 
 nutation corrections can be provided via the `δX` and `δY` parameters.
 
 !!! note 
@@ -70,17 +70,17 @@ nutation corrections can be provided via the `δX` and `δY` parameters.
 ### See also 
 See also [`iers_cip_motion`](@ref) and [`cip_xy`](@ref).
 """
-function cip_xys(m::IERSModel, t::Number, δX::Number=0, δY::Number=0)
+function cip_xys(m::IERSModel, tt_c::Number, δX::Number=0, δY::Number=0)
 
     # Compute CIP coordinates 
-    x, y = cip_xy(m, t)
+    x, y = cip_xy(m, tt_c)
 
     # Add EOP corrections
     X = x + δX 
     Y = y + δY
 
     # Compute CIO locator 
-    s = cio_locator(m, t, X, Y)
+    s = cio_locator(m, tt_c, X, Y)
 
     return X, Y, s
 
@@ -88,10 +88,10 @@ end
 
 
 """
-    cip_vector(m::IERSModel, t::Number)
+    cip_vector(m::IERSModel, tt_c::Number)
 
 Compute the Celestial Intermediate Pole (CIP) vector, following the IERS Conventions `m` at 
-time `t`, expressed in `TT` Julian centuries since J2000.
+time `tt_c`, expressed in `TT` Julian centuries since J2000.
 
 ### References 
 - Wallace P. T. and Capitaine N. (2006), Precession-nutation procedures consistent with 
@@ -100,16 +100,16 @@ time `t`, expressed in `TT` Julian centuries since J2000.
 ### See also 
 See also [`cip_xy`](@ref).
 """
-function cip_vector(m::IERSModel, t::Number)
-    xs, ys = cip_xy(m, t)
+function cip_vector(m::IERSModel, tt_c::Number)
+    xs, ys = cip_xy(m, tt_c)
     return SA[xs, ys, sqrt(1 - xs^2 - ys^2)]
 end
 
 
 """
-    cio_locator(m::IERSModel, t::Number, x::Number, y::Number)
+    cio_locator(m::IERSModel, tt_c::Number, x::Number, y::Number)
 
-Compute the CIO locator `s`, in radians, following the IERS Conventions `m` at time `t`, 
+Compute the CIO locator `s`, in radians, following the IERS Conventions `m` at time `tt_c`, 
 expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` and `y`.
 
 ### References 
@@ -121,24 +121,24 @@ expressed in `TT` Julian centuries since J2000, given the CIP coordinates `x` an
 ### See also 
 See also [`iers_cip_motion`](@ref), [`cip_xy`](@ref) and [`cip_xys`](@ref).
 """
-function cio_locator(m::IERSModel, t, x, y)
-    _cio_locator(m, t, DelaunayArgs(m, t), PlanetaryArgs(m, t)) - x*y/2
+function cio_locator(m::IERSModel, tt_c, x, y)
+    _cio_locator(m, tt_c, DelaunayArgs(m, tt_c), PlanetaryArgs(m, tt_c)) - x*y/2
 end
 
 
 # 1996 CONVENTIONS
 # ============================
-function cip_xy(m::IERS1996, t::Number)
+function cip_xy(m::IERS1996, tt_c::Number)
 
     # Compute Delaunay's arguments
-    d = DelaunayArgs(m, t)
+    d = DelaunayArgs(m, tt_c)
 
     # Evaluate X, Y harmonic series 
-    xh, yh = _cip_xy(m, t, d)
+    xh, yh = _cip_xy(m, tt_c, d)
 
     # Compute polynomial parts 
-    xp = arcsec2rad(@evalpoly(t, 0, 2004.3109, -0.42665, -0.198656, 0.000014))
-    yp = arcsec2rad(@evalpoly(t, -0.00013, 0, -22.40992, 0.001836, 0.0011130))
+    xp = arcsec2rad(@evalpoly(tt_c, 0, 2004.3109, -0.42665, -0.198656, 0.000014))
+    yp = arcsec2rad(@evalpoly(tt_c, -0.00013, 0, -22.40992, 0.001836, 0.0011130))
 
     # Compute mean obliquity at reference epoch 
     ϵ₀ = iers_obliquity(m, 0)
@@ -147,23 +147,23 @@ function cip_xy(m::IERS1996, t::Number)
     sA, cA = sincos(2*(d.F - d.D + d.Ω))
 
     # Compute final CEP coordinates 
-    x = xp + sin(ϵ₀)*xh + arcsec2rad(0.00204*sΩ + 0.00016*sA)*t^2
-    y = yp + yh + arcsec2rad(-0.00231*cΩ - 0.00014*cA)*t^2
+    x = xp + sin(ϵ₀)*xh + arcsec2rad(0.00204*sΩ + 0.00016*sA)*tt_c^2
+    y = yp + yh + arcsec2rad(-0.00231*cΩ - 0.00014*cA)*tt_c^2
 
     return x, y 
 
 end
 
-function cio_locator(m::IERS1996, t::Number, x::Number, y::Number)
+function cio_locator(m::IERS1996, tt_c::Number, x::Number, y::Number)
 
-    d = DelaunayArgs(m, t)
+    d = DelaunayArgs(m, tt_c)
 
     sΩ = sin(d.Ω) 
     sA = sin(2*(d.F - d.D + d.Ω))
 
     # Compute the polynomial and harmonic parts 
-    sp = @evalpoly(t, 0, 0.00385, 0, -0.07259)
-    sh = -0.00264*sΩ - 0.00006*sin(2*d.Ω) + t^2*(0.00074*sΩ + 0.00006*sA)
+    sp = @evalpoly(tt_c, 0, 0.00385, 0, -0.07259)
+    sh = -0.00264*sΩ - 0.00006*sin(2*d.Ω) + tt_c^2*(0.00074*sΩ + 0.00006*sA)
 
     return arcsec2rad(sp + sh) - x*y/2
 
@@ -179,9 +179,9 @@ build_series(
 # 2003 CONVENTIONS
 # ============================
 
-function cip_xy(m::IERS2003, t::Number)
+function cip_xy(m::IERS2003, tt_c::Number)
     # Extracted from the IAU-2000 bias-precession-nutation matrix 
-    return npb2xy(iers_npb(m, t))
+    return npb2xy(iers_npb(m, tt_c))
 end
 
 include("constants/cio2000.jl")
@@ -191,38 +191,38 @@ build_series(:_cio_locator, :IERS2003, [COEFFS_CIO2000_S], [COEFFS_CIO2000_SP])
 # 2010 CONVENTIONS
 # ============================
 
-function cip_xy(m::IERS2010, t::Number)
+function cip_xy(m::IERS2010, tt_c::Number)
     
     # Compute Fukushima-Williams angles 
-    γ, ϕ, ψ, ϵ = fw_angles(m, t)
+    γ, ϕ, ψ, ϵ = fw_angles(m, tt_c)
 
     # Compute the IAU 2000 nutation components 
-    Δψ, Δϵ = iers_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, tt_c)
 
     # Retrieve the CIP coordinates by applying IAU-2006 compatible nutations 
     return fw2xy(γ, ϕ, ψ + Δψ, ϵ + Δϵ)
 
 end
 
-function cip_xy(m::CPNC, t::Number)
-    return _cip_xy(m, t, DelaunayArgs(m, t))
+function cip_xy(m::CPNC, tt_c::Number)
+    return _cip_xy(m, tt_c, DelaunayArgs(m, tt_c))
 end
 
-function cip_xy(::CPND, t::Number)
+function cip_xy(::CPND, tt_c::Number)
 
     μas2rad = 1e-6 * π / 648000
 
     # Approximated fundamental arguments as linear function of time 
-    Ω = 2.182439196616 - 33.7570459536t
-    A = -2.776244621014 + 1256.6639307381t
+    Ω = 2.182439196616 - 33.7570459536tt_c
+    A = -2.776244621014 + 1256.6639307381tt_c
 
     sΩ, cΩ = sincos(Ω)
     sA, cA = sincos(A)
 
-    x = @evalpoly(t, 0, 2004191898, -429782.9, -198618.34)
+    x = @evalpoly(tt_c, 0, 2004191898, -429782.9, -198618.34)
     x -= 6844318*sΩ + 523908*sA
 
-    y = @evalpoly(t, 0, 0, -22407275)
+    y = @evalpoly(tt_c, 0, 0, -22407275)
     y += 9205236*cΩ + 573033*cA
 
     x *= μas2rad
@@ -231,12 +231,12 @@ function cip_xy(::CPND, t::Number)
     return x, y
 end
 
-function cio_locator(::CPNC, t::Number, x::Number, y::Number)
+function cio_locator(::CPNC, tt_c::Number, x::Number, y::Number)
 
     # Simplified model! 
-    Ω = 2.182439196616 - 33.7570459536t
+    Ω = 2.182439196616 - 33.7570459536tt_c
 
-    s = @evalpoly(t, 0, 3809, 0, -72574.0)
+    s = @evalpoly(tt_c, 0, 3809, 0, -72574.0)
     s -= 2641 * sin(Ω)
 
     # Transform s from μas to radians 

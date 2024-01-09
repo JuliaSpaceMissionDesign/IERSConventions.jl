@@ -1,9 +1,9 @@
 
 """
-    fw_angles(m::IERS2010, t::Number) 
+    fw_angles(m::IERS2010, tt_c::Number) 
 
 Compute the precession angles, γ, ϕ, ψ, ϵ in radians, according to the IAU 2006 
-Fukushima-Williams 4-angle formulation at time `t` expressed in `TT` Julian centuries 
+Fukushima-Williams 4-angle formulation at time `tt_c` expressed in `TT` Julian centuries 
 since `J2000`.
 
 ### References 
@@ -13,26 +13,26 @@ since `J2000`.
   IAU 2006 resolutions, [DOI: 10.1051/0004-6361:20065897](https://www.aanda.org/articles/aa/abs/2006/45/aa5897-06/aa5897-06.html) 
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/pfw06.c) library
 """
-function fw_angles(::IERS2010, t::Number)
+function fw_angles(::IERS2010, tt_c::Number)
     γ = arcsec2rad(
         @evalpoly(
-            t, -0.052928, 10.556378, 0.4932044, -0.00031238, -0.000002788, 0.0000000260,
+            tt_c, -0.052928, 10.556378, 0.4932044, -0.00031238, -0.000002788, 0.0000000260,
         )
     )
 
     ϕ = arcsec2rad(
         @evalpoly(
-            t, 84381.412819, -46.811016, 0.0511268, 0.00053289, -0.000000440, -0.0000000176,
+            tt_c, 84381.412819, -46.811016, 0.0511268, 0.00053289, -0.000000440, -0.0000000176,
         )
     )
 
     ψ = arcsec2rad(
         @evalpoly(
-            t, -0.041775, 5038.481484, 1.5584175, -0.00018522, -0.000026452, -0.0000000148,
+            tt_c, -0.041775, 5038.481484, 1.5584175, -0.00018522, -0.000026452, -0.0000000148,
         )
     )
 
-    ϵ = iers_obliquity(iers2010a, t)
+    ϵ = iers_obliquity(iers2010a, tt_c)
     
     return γ, ϕ, ψ, ϵ
 end

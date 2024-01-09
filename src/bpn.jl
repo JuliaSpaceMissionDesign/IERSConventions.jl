@@ -2,7 +2,7 @@
 export iers_bias, iers_pb, iers_npb
 
 """
-    iers_bias(m::IERSModel, t::Number)
+    iers_bias(m::IERSModel, tt_c::Number)
 
 Compute the frame bias matrix, which transform vectors from the GCRF axes to the Mean 
 Equinox and Mean Equator of J2000 (MEME2000) axes. 
@@ -23,10 +23,10 @@ iers_bias
 
 
 """
-    iers_pb(m::IERSModel, t::Number)
+    iers_pb(m::IERSModel, tt_c::Number)
 
 Compute the precession-bias (PB) matrix, which transforms vectors from the GCRF axes to
-Mean-of-Date (MOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, according 
+Mean-of-Date (MOD) axes, at time `tt_c` expressed in `TT` Julian centuries since `J2000`, according 
 to the IERS convention `m`
 
 ### References 
@@ -43,10 +43,10 @@ iers_pb
 
 
 """
-    iers_npb(m::IERSModel, t::Number, δΔψ=0, δΔϵ=0)
+    iers_npb(m::IERSModel, tt_c::Number, δΔψ=0, δΔϵ=0)
 
 Compute the nutation-bias-precession (NPB) matrix, which transforms vectors from the GCRF 
-to True-of-Date (TOD) axes, at time `t` expressed in `TT` Julian centuries since `J2000`, 
+to True-of-Date (TOD) axes, at time `tt_c` expressed in `TT` Julian centuries since `J2000`, 
 according to the IERS convention `m`
 
 ### References 
@@ -65,15 +65,15 @@ iers_npb
 # 1996 CONVENTIONS
 # ============================
 
-iers_bias(::IERS1996, ::Number) = DCM(1I)
+iers_bias(::IERS1996, tt_c::Number) = DCM(1I)
 
-iers_pb(m::IERS1996, t::Number) = iers_precession(m, t)
+iers_pb(m::IERS1996, tt_c::Number) = iers_precession(m, tt_c)
 
-function iers_npb(m::IERS1996, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS1996, tt_c::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Compute precession and nutation matrices
-    rp = iers_precession(m, t)
-    rn = iers_nutation(m, t, δΔψ, δΔϵ)
+    rp = iers_precession(m, tt_c)
+    rn = iers_nutation(m, tt_c, δΔψ, δΔϵ)
 
     # Form Precession-Nutation matrix 
     return rn * rp
@@ -98,24 +98,24 @@ function iers_bias(m::IERS2003, ::Number)
     return angle_to_dcm(δα₀, ξ₀, -η₀, :ZYX)
 end
 
-function iers_pb(m::IERS2003, t::Number)
+function iers_pb(m::IERS2003, tt_c::Number)
 
     # Compute bias and precession matrices
-    rb = iers_bias(m, t)
-    rp = iers_precession(m, t)
+    rb = iers_bias(m, tt_c)
+    rp = iers_precession(m, tt_c)
 
     # Form Bias-Precession matrix 
     return rp * rb
 end
 
-function iers_npb(m::IERS2003, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS2003, tt_c::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Compute bias and precession matrices
-    rb = iers_bias(m, t)
-    rp = iers_precession(m, t)
+    rb = iers_bias(m, tt_c)
+    rp = iers_precession(m, tt_c)
 
     # Compute the nutation matrix with added EOP corrections
-    rn = iers_nutation(m, t, δΔψ, δΔϵ)
+    rn = iers_nutation(m, tt_c, δΔψ, δΔϵ)
 
     # Form Bias-Precession matrix 
     return rn * rp * rb
@@ -134,22 +134,22 @@ function iers_bias(m::IERS2010, ::Number)
     return fw_matrix(γ, ϕ, ψ, ϵ)
 end
 
-function iers_pb(m::IERS2010, t::Number)
+function iers_pb(m::IERS2010, tt_c::Number)
 
     # Computes Fukushima-Williams angles at epoch
-    γ, ϕ, ψ, ϵ = fw_angles(m, t)
+    γ, ϕ, ψ, ϵ = fw_angles(m, tt_c)
 
     # Compute the Bias-precession matrix
     return fw_matrix(γ, ϕ, ψ, ϵ)
 end
 
-function iers_npb(m::IERS2010, t::Number, δΔψ::Number=0, δΔϵ::Number=0)
+function iers_npb(m::IERS2010, tt_c::Number, δΔψ::Number=0, δΔϵ::Number=0)
 
     # Computes Fukushima-Williams angles
-    γ, ϕ, ψ, ϵ = fw_angles(m, t)
+    γ, ϕ, ψ, ϵ = fw_angles(m, tt_c)
 
     # Computes IAU 2000 nutation components 
-    Δψ, Δϵ = iers_nutation_comp(m, t)
+    Δψ, Δϵ = iers_nutation_comp(m, tt_c)
 
     # Compute the Bias-precession-nutation matrix by applying 
     # the IAU-2006 compatible nutations with added EOP nutation corrections

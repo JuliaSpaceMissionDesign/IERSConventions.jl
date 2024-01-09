@@ -2,10 +2,10 @@
 export iers_gmst, iers_gast
 
 """
-    iers_gmst(m::IERSModel, t::Number)
+    iers_gmst(m::IERSModel, tt_c::Number)
 
 Compute the Greenwich Mean Sidereal Time (GMST), in radians, following the IERS Conventions 
-`m` at time `t` expressed as `TT` Julian centuries since J2000. 
+`m` at time `tt_c` expressed as `TT` Julian centuries since J2000. 
 
 !!! note 
     The input time is automatically converted to UT1 for the computation of the Earth 
@@ -20,25 +20,25 @@ Compute the Greenwich Mean Sidereal Time (GMST), in radians, following the IERS 
 ### See also 
 See also [`iers_gast`](@ref) and [`iers_era`](@ref).
 """
-function iers_gmst(m::IERSModel, t::Number)
+function iers_gmst(m::IERSModel, tt_c::Number)
 
     # Transform from TT centuries to UT1 days
-    ut1 = t*Tempo.CENTURY2DAY + offset_tt2ut1(t*Tempo.CENTURY2SEC)/Tempo.DAY2SEC
+    ut1_d = tt_c*Tempo.CENTURY2DAY + offset_tt2ut1(tt_c*Tempo.CENTURY2SEC)/Tempo.DAY2SEC
 
     # Compute the Earth Rotation Angle 
-    θ = iers_era(m, ut1)
+    θ = iers_era(m, ut1_d)
 
     # Compute GMST 
-    return iers_gmst(m, t, θ)
+    return iers_gmst(m, tt_c, θ)
 
 end
 
 
 """
-    iers_gast(m::IERSModel, t::Number, δΔψ::Number=0)
+    iers_gast(m::IERSModel, tt_c::Number, δΔψ::Number=0)
 
 Compute the Greenwich Apparent Sidereal Time (GAST), in radians, following the IERS 
-Conventions `m` at time `t` expressed as `TT` Julian centuries since J2000. An optional EOP 
+Conventions `m` at time `tt_c` expressed as `TT` Julian centuries since J2000. An optional EOP 
 correction for the nutation in longitude can be passed via `δΔψ` for the exact computation 
 of the equation of the equinoxes. 
 
@@ -55,16 +55,16 @@ of the equation of the equinoxes.
 ### See also 
 See also [`iers_gmst`](@ref), [`equation_equinoxes`](@ref) and [`iers_era`](@ref).
 """
-function iers_gast(m::IERSModel, t::Number, δΔψ::Number=0)
-    return iers_gmst(m, t) + equation_equinoxes(m, t, δΔψ)
+function iers_gast(m::IERSModel, tt_c::Number, δΔψ::Number=0)
+    return iers_gmst(m, tt_c) + equation_equinoxes(m, tt_c, δΔψ)
 end
 
 
 """
-    equation_equinoxes(m::IERSModel, t::Number, δΔψ::Number = 0)
+    equation_equinoxes(m::IERSModel, tt_c::Number, δΔψ::Number = 0)
 
 Compute the Equation of the Equinoxes, in radians, according to the IERS Conventions `m`, 
-at time `t` expressed as `TT` Julian centuries since J2000. An optional EOP correction for 
+at time `tt_c` expressed as `TT` Julian centuries since J2000. An optional EOP correction for 
 the nutation in longitude can be passed via `δΔψ`.
 
 !!! note 
@@ -79,22 +79,22 @@ the nutation in longitude can be passed via `δΔψ`.
 ### See also 
 See also [`iers_obliquity`](@ref), [`iers_nutation_comp`](@ref) and [`eeq_complementary`](@ref).
 """
-function equation_equinoxes(m::IERSModel, t::Number, δΔψ::Number=0)
+function equation_equinoxes(m::IERSModel, tt_c::Number, δΔψ::Number=0)
 
     # Retrive the mean obliquity and the nutation in longitude 
-    ϵₐ = iers_obliquity(m, t)
-    Δψ, _ = iers_nutation_comp(m, t) 
+    ϵₐ = iers_obliquity(m, tt_c)
+    Δψ, _ = iers_nutation_comp(m, tt_c) 
 
-    return (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, t)
+    return (Δψ + δΔψ)*cos(ϵₐ) + eeq_complementary(m, tt_c)
 
 end
 
 
 """
-    eeq_complementary(m::IERSModel, t::Number)
+    eeq_complementary(m::IERSModel, tt_c::Number)
 
 Compute the complementary terms of the equation of the equinoxes, in radians, associated 
-to the IERS Conventions `m`, at time `t` expressed in `TT` Julian centuries since J2000.
+to the IERS Conventions `m`, at time `tt_c` expressed in `TT` Julian centuries since J2000.
 
 !!! note 
     For the IERS 1996 Conventions, starting from 1997-02-27T00:00:00 UTC, two additional 
@@ -107,8 +107,8 @@ to the IERS Conventions `m`, at time `t` expressed in `TT` Julian centuries sinc
 - IERS Technical Note No. [32](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn32.html)
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 """
-function eeq_complementary(m::IERSModel, t::Number) 
-    return ee_cpt(m, t, DelaunayArgs(m, t), PlanetaryArgs(m, t))
+function eeq_complementary(m::IERSModel, tt_c::Number) 
+    return ee_cpt(m, tt_c, DelaunayArgs(m, tt_c), PlanetaryArgs(m, tt_c))
 end
 
 
@@ -116,10 +116,10 @@ end
 # ============================
 
 # t = TT Julian centuries since J2000 
-function iers_gmst(::IERS1996, t::Number)
+function iers_gmst(::IERS1996, tt_c::Number)
 
     # Transform from TT centuries to UT1 centuries
-    ut1 = t + offset_tt2ut1(t*Tempo.CENTURY2SEC)/Tempo.CENTURY2SEC
+    ut1_c = tt_c + offset_tt2ut1(tt_c*Tempo.CENTURY2SEC)/Tempo.CENTURY2SEC
 
     # Coefficients for the IAU 1982 GMST-UT1 model. The first component has been adjusted 
     # of 12 hours because the input is defined with respect to noon of 01-01-2000
@@ -129,17 +129,17 @@ function iers_gmst(::IERS1996, t::Number)
     D = -6.2e-6
 
     # Fractional part of UT1, in seconds
-    f = Tempo.DAY2SEC*mod(ut1*Tempo.CENTURY2DAY, 1)
+    f = Tempo.DAY2SEC*mod(ut1_c*Tempo.CENTURY2DAY, 1)
 
     # Compute GMST
-    return mod2pi(2π/86400*(@evalpoly(ut1, A, B, C, D) + f))
+    return mod2pi(2π/86400*(@evalpoly(ut1_c, A, B, C, D) + f))
 
 end
 
-function eeq_complementary(m::IERS1996, t::Number) 
+function eeq_complementary(m::IERS1996, tt_c::Number) 
 
     # Compute the longitude of the ascending node of the Moon
-    Ω = delaunay_longitude_node(m, t)
+    Ω = delaunay_longitude_node(m, tt_c)
 
     # Compute complementary terms 
     eeq = arcsec2rad(0.00264*sin(Ω) + 0.000063*sin(2Ω))
@@ -151,7 +151,7 @@ function eeq_complementary(m::IERS1996, t::Number)
     t_ref = -8.9726337816e7/Tempo.CENTURY2SEC
 
     # Guarantees type stability
-    return t < t_ref ? 0*eeq : eeq 
+    return tt_c < t_ref ? 0*eeq : eeq 
 
 end
 
@@ -159,11 +159,11 @@ end
 # 2003 CONVENTIONS
 # ============================
 
-function iers_gmst(::IERS2003, t::Number, θ::Number)
+function iers_gmst(::IERS2003, tt_c::Number, θ::Number)
 
     # Evaluate the polynomial expression
     p = @evalpoly(
-        t, 
+        tt_c, 
         0.014506, 
      4612.15739966,   
         1.39667721, 
@@ -184,11 +184,11 @@ build_series(:ee_cpt, :IERSModel, [COEFFS_EEQ2000])
 # ============================
 
 # t = TT Julian centuries since J2000, θ = ERA 
-function iers_gmst(::IERS2010, t::Number, θ::Number)
+function iers_gmst(::IERS2010, tt_c::Number, θ::Number)
 
     # Evaluate interpolating series
     p = @evalpoly(
-        t, 
+        tt_c, 
         0.014506, 
      4612.156534,   
         1.3915817, 

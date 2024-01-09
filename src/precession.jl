@@ -2,10 +2,10 @@
 export iers_precession
 
 """ 
-    iers_precession(m::IERSModel, t::Number)
+    iers_precession(m::IERSModel, tt_c::Number)
 
 Return the precession matrix that rotates a vector from MEME2000 axes to Mean of Date (MOD) 
-axes, at time `t` expressed in `TT` Julian centuries since `J2000`, according to the IERS 
+axes, at time `tt_c` expressed in `TT` Julian centuries since `J2000`, according to the IERS 
 convention `m`. 
 
 !!! note    
@@ -34,10 +34,10 @@ convention `m`.
 ### See also 
 See also [`precession_angles_rot3`](@ref) and [`precession_angles_rot4`](@ref)
 """
-function iers_precession(m::IERSModel, t::Number)
+function iers_precession(m::IERSModel, tt_c::Number)
 
     # Compute the precession angles 
-    ϵ₀, ψₐ, ωₐ, χₐ = precession_angles_rot4(m, t)
+    ϵ₀, ψₐ, ωₐ, χₐ = precession_angles_rot4(m, tt_c)
 
     # Form the precession matrix
     return angle_to_dcm(χₐ, :Z)*angle_to_dcm(ϵ₀, -ψₐ, -ωₐ, :XZX)
@@ -46,9 +46,9 @@ end
 
 
 """ 
-    precession_angles_rot3(m::IERSModel, t::Number)
+    precession_angles_rot3(m::IERSModel, tt_c::Number)
 
-Return the equatorial precession angles zₐ, θₐ, ζₐ, in radians, at time `t` expressed in 
+Return the equatorial precession angles zₐ, θₐ, ζₐ, in radians, at time `tt_c` expressed in 
 `TT` Julian centuries since `J2000` for the 3-rotations precession series initially used 
 by Newcomb and Lieske. 
 
@@ -79,9 +79,9 @@ precession_angles_rot3
 
 """
 
-    precession_angles_rot4(m::IERSModel, t::Number)
+    precession_angles_rot4(m::IERSModel, tt_c::Number)
 
-Return the precession angles ϵ₀, ψₐ, ωₐ, χₐ, in radians, at time `t` expressed in `TT` Julian 
+Return the precession angles ϵ₀, ψₐ, ωₐ, χₐ, in radians, at time `tt_c` expressed in `TT` Julian 
 centuries since `J2000` required for the canonical 4-rotations precession series.
 
 !!! note 
@@ -102,33 +102,33 @@ precession_angles_rot4
 # 1996 CONVENTIONS
 # ============================
 
-function iers_precession(m::IERS1996, t::Number)
+function iers_precession(m::IERS1996, tt_c::Number)
 
     # Compute the precession angles 
-    zₐ, θₐ, ζₐ = precession_angles_rot3(m, t)
+    zₐ, θₐ, ζₐ = precession_angles_rot3(m, tt_c)
 
     # Form the precession matrix
     return angle_to_dcm(-ζₐ, θₐ, -zₐ, :ZYZ)
 
 end
 
-function precession_angles_rot3(::IERS1996, t::Number)
+function precession_angles_rot3(::IERS1996, tt_c::Number)
 
-    ζₐ = arcsec2rad(@evalpoly(t, 0, 2306.2181,  0.30188,  0.017998))
-    θₐ = arcsec2rad(@evalpoly(t, 0, 2004.3109, -0.42665, -0.041833))
-    zₐ = arcsec2rad(@evalpoly(t, 0, 2306.2181,  1.09468,  0.018203))
+    ζₐ = arcsec2rad(@evalpoly(tt_c, 0, 2306.2181,  0.30188,  0.017998))
+    θₐ = arcsec2rad(@evalpoly(tt_c, 0, 2004.3109, -0.42665, -0.041833))
+    zₐ = arcsec2rad(@evalpoly(tt_c, 0, 2306.2181,  1.09468,  0.018203))
 
     return zₐ, θₐ, ζₐ
 
 end
 
-function precession_angles_rot4(m::IERS1996, t::Number)
+function precession_angles_rot4(m::IERS1996, tt_c::Number)
 
     ϵ₀ = iers_obliquity(m, 0)
-    ωₐ = ϵ₀ + arcsec2rad(@evalpoly(t, 0, 0, 0.05127, -0.007726))
+    ωₐ = ϵ₀ + arcsec2rad(@evalpoly(tt_c, 0, 0, 0.05127, -0.007726))
 
-    ψₐ = arcsec2rad(@evalpoly(t, 0, 5038.7784, -1.07259, -0.001147))
-    χₐ = arcsec2rad(@evalpoly(t, 0, 10.5526, -2.38064, -0.001125))
+    ψₐ = arcsec2rad(@evalpoly(tt_c, 0, 5038.7784, -1.07259, -0.001147))
+    χₐ = arcsec2rad(@evalpoly(tt_c, 0, 10.5526, -2.38064, -0.001125))
 
     return ϵ₀, ψₐ, ωₐ, χₐ
 
@@ -138,31 +138,31 @@ end
 # 2003 CONVENTIONS
 # ============================
 
-function precession_angles_rot3(::IERS2003, t::Number)
+function precession_angles_rot3(::IERS2003, tt_c::Number)
 
     ζₐ = arcsec2rad(
-        @evalpoly(t, 2.5976176, 2306.0809506,  0.3019015, 0.0179663, -0.0000327, -0.0000002)
+        @evalpoly(tt_c, 2.5976176, 2306.0809506,  0.3019015, 0.0179663, -0.0000327, -0.0000002)
     )
 
     θₐ = arcsec2rad(
-        @evalpoly(t, 0, 2004.1917476, -0.4269353, -0.0418251, -0.0000601, -0.0000001)
+        @evalpoly(tt_c, 0, 2004.1917476, -0.4269353, -0.0418251, -0.0000601, -0.0000001)
     )
 
     zₐ = arcsec2rad(
-        @evalpoly(t, -2.5976176, 2306.0803226, 1.0947790,  0.0182273, 0.0000470, -0.0000003)
+        @evalpoly(tt_c, -2.5976176, 2306.0803226, 1.0947790,  0.0182273, 0.0000470, -0.0000003)
     )
 
     return zₐ, θₐ, ζₐ
 
 end
 
-function precession_angles_rot4(m::IERS2003, t::Number)
+function precession_angles_rot4(m::IERS2003, tt_c::Number)
 
     ϵ₀ = iers_obliquity(m, 0)
-    ωₐ = ϵ₀ + arcsec2rad(@evalpoly(t, 0, -0.02524, 0.05127, -0.007726))
+    ωₐ = ϵ₀ + arcsec2rad(@evalpoly(tt_c, 0, -0.02524, 0.05127, -0.007726))
 
-    ψₐ = arcsec2rad(@evalpoly(t, 0, 5038.47875, -1.07259, -0.001147))
-    χₐ = arcsec2rad(@evalpoly(t, 0, 10.5526, -2.38064, -0.001125))
+    ψₐ = arcsec2rad(@evalpoly(tt_c, 0, 5038.47875, -1.07259, -0.001147))
+    χₐ = arcsec2rad(@evalpoly(tt_c, 0, 10.5526, -2.38064, -0.001125))
 
     return ϵ₀, ψₐ, ωₐ, χₐ
 
@@ -172,40 +172,40 @@ end
 # 2010 CONVENTIONS
 # ============================
 
-function precession_angles_rot3(::IERS2010, t::Number)
+function precession_angles_rot3(::IERS2010, tt_c::Number)
 
     # Values have been retrieved from Table 1 of Hilton (2006)
     ζₐ = arcsec2rad(
-        @evalpoly(t, 2.650545, 2306.083227, 0.2988499, 0.01801828, -5.971e-6, -3.173e-7)
+        @evalpoly(tt_c, 2.650545, 2306.083227, 0.2988499, 0.01801828, -5.971e-6, -3.173e-7)
     )
 
     θₐ = arcsec2rad(
-        @evalpoly(t, 0, 2004.191903, -0.4294934, -0.04182264, -7.089e-6, -1.274e-7)
+        @evalpoly(tt_c, 0, 2004.191903, -0.4294934, -0.04182264, -7.089e-6, -1.274e-7)
     )
 
     zₐ = arcsec2rad(
-        @evalpoly(t, -2.650545, 2306.077181, 1.0927348, 0.01826837, -0.000028596, -2.904e-7)
+        @evalpoly(tt_c, -2.650545, 2306.077181, 1.0927348, 0.01826837, -0.000028596, -2.904e-7)
     )
 
     return zₐ, θₐ, ζₐ
 
 end
 
-function precession_angles_rot4(m::IERS2010, t::Number)
+function precession_angles_rot4(m::IERS2010, tt_c::Number)
     
     # This is the so-called P03 model!
     ϵ₀ = iers_obliquity(m, 0)
 
     ωₐ = ϵ₀ + arcsec2rad(
-        @evalpoly(t, 0, -0.025754, 0.0512623, -0.00772503, -0.000000467, 0.0000003337)
+        @evalpoly(tt_c, 0, -0.025754, 0.0512623, -0.00772503, -0.000000467, 0.0000003337)
     )
 
     ψₐ = arcsec2rad(
-        @evalpoly(t, 0, 5038.481507, -1.0790069, -0.00114045, 0.000132851, -0.0000000951)
+        @evalpoly(tt_c, 0, 5038.481507, -1.0790069, -0.00114045, 0.000132851, -0.0000000951)
     )
 
     χₐ = arcsec2rad(
-        @evalpoly(t, 0, 10.556403, -2.3814292, -0.00121197, 0.000170663, -0.0000000560)
+        @evalpoly(tt_c, 0, 10.556403, -2.3814292, -0.00121197, 0.000170663, -0.0000000560)
     )
 
     return ϵ₀, ψₐ, ωₐ, χₐ
