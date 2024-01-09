@@ -93,17 +93,17 @@ set_nutation_corr!(eop::EOPData, ::IERS2003, nc::NutationCorrections) = eop.nut2
 set_nutation_corr!(eop::EOPData, ::IERS2010, nc::NutationCorrections) = eop.nut2010 = nc
 
 """
-    eop_filename(eop::EOPData) 
+    eop_filename() 
 
 Get the loaded Earth Orientation Parameters (EOP) filename.
 """
-function eop_filename(eop::EOPData)
+function eop_filename()
     
-    if isempty(eop.filename) 
+    if isempty(IERS_EOP_DATA.filename) 
         throw(ErrorException("Unable to retrieve filename, no EOP data has been loaded."))
     end
 
-    return eop.filename
+    return IERS_EOP_DATA.filename
 end
 
 
