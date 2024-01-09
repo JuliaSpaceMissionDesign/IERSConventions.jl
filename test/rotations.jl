@@ -360,46 +360,30 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
             end
         end
 
+        # The issue with the PEF is that we do not have an absolute way to test 
+        # this reference frame. Thus we assume that one of the two functions is correct 
+        # and test its inverse against it.
+
+        # TODO: is it possible to find a software that provides it?
+        
+        @testset "ITRF-to-PEF" verbose=true begin 
+
+            for j in eachindex(epochs)
+
+                v_g = rand(BigFloat, 3)
+                v_i = F[j]*v_g; v_i /= norm(v_i)
+
+                tt_s = j2000s(epochs[j])
+
+                S1 = iers_rot3_gcrf_to_pef(tt_s, iers2010a)
+                S2 = iers_rot3_itrf_to_pef(tt_s, iers2010a)
+
+                @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
+
+            end
+
+        end
 
     end
 
 end;
-
-
-# ep_utc = Epoch("2009-09-21T00:00:00 UTC")
-# ep_tt = convert(TT, ep_utc)
-
-# tt_s = j2000s(ep_tt)
-
-# # Bias matrix
-# B = [ 1.00000000e+00  7.07836869e-08 -8.05621421e-08;
-#      -7.07836896e-08  1.00000000e+00 -3.30594317e-08;
-#       8.05621398e-08  3.30594374e-08  1.00000000e+00];
-    
-# # Precession matrix 
-# P = [ 9.99997192e-01  2.17365687e-03  9.44504641e-04;
-#      -2.17365686e-03  9.99997638e-01 -1.03863700e-06;
-#      -9.44504667e-04 -1.01439491e-06  9.99999554e-01];
-
-# M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
-# M - (B*P)'
-
-# T = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
-# Tex = BPN'
-
-# T - Tex
-
-
-# G = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
-
-# begin 
-# Gex = (GA'*BPN')
-# G-Gex
-# end 
-
-# @testset "GCRF-to-MOD" verbose=true begin
-
-#     M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
-#     M - (P*B)'
-
-# end 
