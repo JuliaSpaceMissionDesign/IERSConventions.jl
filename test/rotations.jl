@@ -211,8 +211,6 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
         ep_utc = Epoch("2009-09-21T00:00:00 UTC")
         ep_tt = convert(TT, ep_utc)
 
-        tt_s = j2000s(ep_tt)
-
         # Bias matrix (from EME2000 to ICRF)
         B = [ 1.00000000e+00  7.07836869e-08 -8.05621421e-08;
              -7.07836896e-08  1.00000000e+00 -3.30594317e-08;
@@ -235,7 +233,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
     
         @testset "GCRF-to-MOD" verbose=true begin
         
-            M = iers_rot3_gcrf_to_mod(tt_s, iers2010a)
+            M = iers_rot3_gcrf_to_mod(j2000s(ep_tt), iers2010a)
             Mex = (B*P)'
 
             @test abs(Mex[1, 1] - M[1, 1]) ≤ 1e-9
@@ -252,7 +250,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
         @testset "GCRF-to-TOD" verbose=true begin 
             
-            T = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
+            T = iers_rot3_gcrf_to_tod(j2000s(ep_tt), iers2010a)
             Tex = BPN'
 
             @test abs(Tex[1, 1] - T[1, 1]) ≤ 1e-9
@@ -264,12 +262,35 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
             @test abs(Tex[2, 1] - T[2, 1]) ≤ 1e-12
             @test abs(Tex[2, 3] - T[2, 3]) ≤ 1e-12
             @test abs(Tex[3, 2] - T[3, 2]) ≤ 1e-12
+            
+            # We now also test that with other model approximations, the errors 
+            # are within the expected model accuracy! 
+
+            for j in eachindex(epochs)
+        
+                ep = epochs[j]
+                tt_s = j2000s(ep)
+        
+                S1 = iers_rot3_gcrf_to_tod(tt_s, iers2010a)
+        
+                v = rand(BigFloat, 3)
+
+                S2 = iers_rot3_gcrf_to_tod(tt_s, iers2010b)
+                S3 = iers_rot3_gcrf_to_tod(tt_s, CPNc)
+                S4 = iers_rot3_gcrf_to_tod(tt_s, CPNd)
+    
+                @test v2as(S1*v_g, S2*v_g) ≤ 3e-3
+                @test v2as(S1*v_g, S3*v_g) ≤ 50e-3
+                @test v2as(S1*v_g, S4*v_g) ≤ 1
+
+            end
+
 
         end
 
         @testset "GCRF-to-GTOD" verbose=true begin 
 
-            G = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
+            G = iers_rot3_gcrf_to_gtod(j2000s(ep_tt), iers2010a)
             Gex = GA'*BPN'
 
             @test abs(Gex[1, 1] - G[1, 1]) ≤ 1e-9
@@ -286,22 +307,34 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
             # model. Since we've already validated the GCRF-to-TIRF routine, we don't 
             # need other external test data for this 
             for j in eachindex(epochs)
+
+                tt_s = j2000s(epochs[j])
         
-                ep = epochs[j]
+                S1 = iers_rot3_gcrf_to_tirf(tt_s, iers2010a)
+                S2 = iers_rot3_gcrf_to_gtod(tt_s, iers2010a)
         
-                S1 = iers_rot3_gcrf_to_tirf(j2000s(ep), iers2010a)
-                S2 = iers_rot3_gcrf_to_gtod(j2000s(ep), iers2010a)
-        
-                for _ in 1:10
-                    v = rand(BigFloat, 3)
-                    @test v2as(S1*v, S2*v) ≤ 10e-6 
-                end
+                v = rand(BigFloat, 3)
+                @test v2as(S1*v, S2*v) ≤ 10e-6 
+
+                # We now also test that with other model approximations, the errors 
+                # are within the expected model accuracy! 
+                S3 = iers_rot3_gcrf_to_gtod(tt_s, iers2010b)
+                S4 = iers_rot3_gcrf_to_gtod(tt_s, CPNc)
+                S5 = iers_rot3_gcrf_to_gtod(tt_s, CPNd)
+
+                @test v2as(S2*v_g, S3*v_g) ≤ 3e-3
+                @test v2as(S2*v_g, S4*v_g) ≤ 50e-3
+                @test v2as(S2*v_g, S5*v_g) ≤ 1
+
             end
 
         end
 
+
         # Now that we have evaluated the rotations from the GCRF, we can indirectly 
         # test the ones that start from the ITRF at multiple epochs
+        # ===========================================================================
+
         F = DCM{Float64}[]
         for j in eachindex(epochs)
             push!(F, iers_rot3_gcrf_to_itrf(j2000s(epochs[j]), iers2010a))
@@ -339,6 +372,17 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
                 @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
 
+                # We now also test that with other model approximations, the errors 
+                # are within the expected model accuracy! 
+
+                S3 = iers_rot3_itrf_to_tod(tt_s, iers2010b)
+                S4 = iers_rot3_itrf_to_tod(tt_s, CPNc)
+                S5 = iers_rot3_itrf_to_tod(tt_s, CPNd)
+
+                @test v2as(S2*v_g, S3*v_g) ≤ 3e-3
+                @test v2as(S2*v_g, S4*v_g) ≤ 50e-3
+                @test v2as(S2*v_g, S5*v_g) ≤ 1
+
             end
 
         end
@@ -356,6 +400,17 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                 S2 = iers_rot3_itrf_to_gtod(tt_s, iers2010a)
 
                 @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
+
+                # We now also test that with other model approximations, the errors 
+                # are within the expected model accuracy! 
+
+                S3 = iers_rot3_itrf_to_gtod(tt_s, iers2010b)
+                S4 = iers_rot3_itrf_to_gtod(tt_s, CPNc)
+                S5 = iers_rot3_itrf_to_gtod(tt_s, CPNd)
+
+                @test v2as(S2*v_g, S3*v_g) ≤ 3e-3
+                @test v2as(S2*v_g, S4*v_g) ≤ 50e-3
+                @test v2as(S2*v_g, S5*v_g) ≤ 1
 
             end
         end
@@ -380,6 +435,18 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
                 @test v2as(S1*v_g, S2*v_i) ≤ 3e-6
 
+                # We are also testing that the error in the ITRF-to-PEF with the CPNd 
+                # model is within the expected model accuracy (i.e., we test that the 
+                # actual magnitude of the rotation is below 1 arcsec)
+
+                S3 = iers_rot3_itrf_to_pef(tt_s, iers2010b)
+                S4 = iers_rot3_itrf_to_pef(tt_s, CPNc)
+                S5 = iers_rot3_itrf_to_pef(tt_s, CPNd)
+
+                @test v2as(S2*v_i, S3*v_i) ≤ 3e-3
+                @test v2as(S2*v_i, S4*v_i) ≤ 50e-3
+                @test v2as(S2*v_i, S5*v_i) ≤ 1
+            
             end
 
         end
