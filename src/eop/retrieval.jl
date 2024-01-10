@@ -1,4 +1,8 @@
 
+# NOTE: we disable flat extrapolation so we don't have to perform the check 
+# on the interpolation boundaries twice.  
+
+
 """
     eop_δΔψ(m::IERSModel, tt_c::Number)
 
@@ -6,18 +10,27 @@ Interpolate and retrieve the EOP nutation correction in longitude `δΔψ`, in r
 at time `tt_c` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_δΔψ(::IERS2010A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2010.δΔψ, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2010.δΔψ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δΔψ(::IERS2003A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2003.δΔψ, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2003.δΔψ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δΔψ(::IERS1996, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut1996.δΔψ, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut1996.δΔψ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_δΔψ(::IERSModel, ::Number) = 0
@@ -30,18 +43,27 @@ Interpolate and retrieve the EOP nutation correction in obliquity `δΔϵ`, in r
 at time `tt_c` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_δΔϵ(::IERS2010A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2010.δΔϵ, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2010.δΔϵ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δΔϵ(::IERS2003A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2003.δΔϵ, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2003.δΔϵ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δΔϵ(::IERS1996, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut1996.δΔϵ, tt_c)
+    if eop_check_time(tt_c)         
+        return π/648000*interpolate(IERS_EOP.nut1996.δΔϵ, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_δΔϵ(::IERSModel, ::Number) = 0
@@ -54,18 +76,27 @@ Interpolate and retrieve the CIP `δX` correction, in radians, at time `tt_c` ex
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_δX(::IERS2010A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2010.δX, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2010.δX, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δX(::IERS2003A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2003.δX, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2003.δX, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δX(::IERS1996, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut1996.δX, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut1996.δX, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_δX(::IERSModel, ::Number) = 0
@@ -78,18 +109,27 @@ Interpolate and retrieve the CIP `δY` correction, in radians, at time `tt_c` ex
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_δY(::IERS2010A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2010.δY, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2010.δY, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δY(::IERS2003A, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut2003.δY, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut2003.δY, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 function eop_δY(::IERS1996, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.nut1996.δY, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.nut1996.δY, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_δY(::IERSModel, ::Number) = 0
@@ -102,8 +142,11 @@ Interpolate and retrieve the pole `xₚ` coordinate, in radians, at time `tt_c` 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_xp(::IERSModel, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.xp, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.xp, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_xp(::CPND, ::Number) = 0
@@ -116,8 +159,11 @@ Interpolate and retrieve the pole `yₚ` coordinate, in radians, at time `tt_c` 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
 """
 function eop_yp(::IERSModel, tt_c::Number)
-    eop_check_init()
-    return π/648000*interpolate(IERS_EOP.yp, tt_c)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.yp, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
 end
 
 eop_yp(::CPND, ::Number) = 0
@@ -129,8 +175,20 @@ eop_yp(::CPND, ::Number) = 0
 Return the TT-to-UT1 offset, in seconds, at `tt_s` expressed in TT seconds since J2000.
 """
 function offset_tt2ut1(tt_s)
-    eop_check_init()
-    return interpolate(IERS_EOP.ut1_tt, tt_s/Tempo.CENTURY2SEC)
+
+    tt_c = tt_s/Tempo.CENTURY2SEC
+
+    if eop_check_time(tt_c)        
+        return interpolate(IERS_EOP.ut1_tt, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
+
 end
 
+# Check whether the input time is within the boundaries of the EOP data
+function eop_check_time(tt_c::Number)
+    eop_check_init()
+    return IERS_EOP_DATA.cent_TT[1] <= tt_c <= IERS_EOP_DATA.cent_TT[end]
+end
 

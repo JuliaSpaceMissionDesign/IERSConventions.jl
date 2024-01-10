@@ -64,7 +64,7 @@ end
 
 function EOPData(::Type{T}=Float64) where T 
     return EOPData(
-        "", T[], T[], T[], T[], T[], T[], 
+        "", T[], [-Inf, -Inf], T[], T[], T[], T[], 
         NutationCorrections(T), NutationCorrections(T), NutationCorrections(T)
     )
 end 
