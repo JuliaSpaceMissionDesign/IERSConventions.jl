@@ -321,7 +321,7 @@ end
 
 function fill_eop_data(raw_data)
 
-    # Fill all the raws with empty data with the latest valid EOP element and 
+    # Fill all the raws with empty data with zero values and 
     # return the output as a Float64 vector.
 
     data = zeros(size(raw_data))
@@ -330,9 +330,9 @@ function fill_eop_data(raw_data)
     lrow = findlast(!isempty, raw_data)
     isnothing(lrow) && return data 
 
-    # Fill the missing elements with the latest available data
+    # Fill the missing elements with null values
     data[1:lrow] = _to_float.(raw_data[1:lrow])
-    data[lrow+1:end] .= _to_float(raw_data[lrow])
+    data[lrow+1:end] .= 0
     
     return data 
 
