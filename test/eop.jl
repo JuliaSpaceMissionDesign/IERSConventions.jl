@@ -124,6 +124,12 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
             @test abs(data4[row, 6] - 1e-3*0.089) ≤ 1e-6
             @test abs(data4[row, 7] - 1e-3*-0.197) ≤ 1e-6
 
+            # Test that when no data is available, the columns are fitted with 0s 
+            ep_utc = Epoch("2024-03-15T00:00:00 UTC")
+            row = get_row(data4, j2000(ep_utc))
+            
+            @test all(data4[row, 5:end] .== 0)
+
             
             # Testing of FINALS IAU 1980
             # ====================================================
@@ -153,6 +159,12 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
             @test abs(data5[row, 8] - 1e-3*-58.779) ≤ 1e-6
             @test abs(data5[row, 9] - 1e-3*-2.140) ≤ 1e-6
 
+            # Test that when no data is available, the columns are fitted with 0s 
+            ep_utc = Epoch("2024-03-15T00:00:00 UTC")
+            row = get_row(data5, j2000(ep_utc))
+            
+            @test all(data5[row, 5:end] .== 0)
+            
         end
 
         @testset "TXT Files" verbose=true begin 
@@ -275,7 +287,12 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
             @test abs(data4[row, 6] - 1e-3*0.089) ≤ 1e-6
             @test abs(data4[row, 7] - 1e-3*-0.197) ≤ 1e-6
 
-
+            # Test that when no data is available, the columns are fitted with 0s 
+            ep_utc = Epoch("2024-03-15T00:00:00 UTC")
+            row = get_row(data4, j2000(ep_utc))
+            
+            @test all(data4[row, 5:end] .== 0)
+            
             # Testing of FINALS IAU 1980
             # ====================================================
 
@@ -303,6 +320,12 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
             # check nutation corrections 
             @test abs(data5[row, 8] - 1e-3*-58.779) ≤ 1e-6
             @test abs(data5[row, 9] - 1e-3*-2.140) ≤ 1e-6
+
+            # Test that when no data is available, the columns are fitted with 0s 
+            ep_utc = Epoch("2024-03-15T00:00:00 UTC")
+            row = get_row(data5, j2000(ep_utc))
+            
+            @test all(data5[row, 5:end] .== 0)
 
         end
     end
@@ -334,6 +357,29 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
 
         str = "EOPData(filename=\"$eop_file\", from: -10227.5 (UTC) to 8741.5 (UTC))\n"
         @test repr(IERSConventions.IERS_EOP_DATA) == str
+
+        t1 = IERSConventions.IERS_EOP_DATA.cent_TT[1]
+        t2 = IERSConventions.IERS_EOP_DATA.cent_TT[end]
+
+        # Check that outside the boundaries all EOP data is zero 
+        for m in (iers2010a, iers2010b, CPNc, CPNd, iers2003a, iers2003b, iers1996)
+            
+            for t in (t1-1e-10, t2+1e-10)
+
+                @test IERSConventions.eop_δΔψ(iers2010a, t) == 0
+                @test IERSConventions.eop_δΔϵ(iers2010a, t) == 0
+
+                @test IERSConventions.eop_δX(iers2010a, t) == 0
+                @test IERSConventions.eop_δY(iers2010a, t) == 0
+
+                @test IERSConventions.eop_xp(iers2010a, t) == 0
+                @test IERSConventions.eop_yp(iers2010a, t) == 0
+
+                @test IERSConventions.offset_tt2ut1(t*Tempo.CENTURY2SEC) == 0
+
+            end
+
+        end
 
     end
 
