@@ -83,14 +83,6 @@ function Base.show(io::IO, eop::EOPData)
 
 end
 
-"""
-    set_nutation_corr!(eop::EOPData, m::IERSModel, nc::NutationCorrections)
-
-Set the nutation and cip corrections associated to the IERS model `m` to `nc`.
-"""
-set_nutation_corr!(eop::EOPData, ::IERS1996, nc::NutationCorrections) = eop.nut1996 = nc
-set_nutation_corr!(eop::EOPData, ::IERS2003, nc::NutationCorrections) = eop.nut2003 = nc
-set_nutation_corr!(eop::EOPData, ::IERS2010, nc::NutationCorrections) = eop.nut2010 = nc
 
 """
     eop_filename() 

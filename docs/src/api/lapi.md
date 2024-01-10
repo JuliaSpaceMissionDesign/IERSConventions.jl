@@ -39,7 +39,6 @@ IERSConventions.fw_matrix
 ### Constants 
 ```@docs
 IERSConventions.NutationCorrections
-IERSConventions.set_nutation_corr!
 IERSConventions.NutCorrectionsInterpolator
 IERSConventions.EOPData
 IERSConventions.EOPInterpolator
