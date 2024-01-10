@@ -8,6 +8,13 @@
 
 Interpolate and retrieve the EOP nutation correction in longitude `δΔψ`, in radians, 
 at time `tt_c` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_δΔϵ`](@ref), [`eop_δX`](@ref) and [`eop_δY`](@ref).
 """
 function eop_δΔψ(::IERS2010A, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -41,6 +48,13 @@ eop_δΔψ(::IERSModel, ::Number) = 0
 
 Interpolate and retrieve the EOP nutation correction in obliquity `δΔϵ`, in radians, 
 at time `tt_c` expressed in `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_δΔψ`](@ref), [`eop_δX`](@ref) and [`eop_δY`](@ref).
 """
 function eop_δΔϵ(::IERS2010A, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -74,6 +88,13 @@ eop_δΔϵ(::IERSModel, ::Number) = 0
 
 Interpolate and retrieve the CIP `δX` correction, in radians, at time `tt_c` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_δΔψ`](@ref), [`eop_δΔϵ`](@ref) and [`eop_δY`](@ref).
 """
 function eop_δX(::IERS2010A, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -107,6 +128,13 @@ eop_δX(::IERSModel, ::Number) = 0
 
 Interpolate and retrieve the CIP `δY` correction, in radians, at time `tt_c` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_δΔψ`](@ref), [`eop_δΔϵ`](@ref) and [`eop_δX`](@ref).
 """
 function eop_δY(::IERS2010A, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -140,6 +168,13 @@ eop_δY(::IERSModel, ::Number) = 0
 
 Interpolate and retrieve the pole `xₚ` coordinate, in radians, at time `tt_c` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_yp`](@ref).
 """
 function eop_xp(::IERSModel, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -157,6 +192,13 @@ eop_xp(::CPND, ::Number) = 0
 
 Interpolate and retrieve the pole `yₚ` coordinate, in radians, at time `tt_c` expressed in 
 `TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+
+### See also 
+See also [`eop_xp`](@ref).
 """
 function eop_yp(::IERSModel, tt_c::Number)
     if eop_check_time(tt_c)        
@@ -173,6 +215,10 @@ eop_yp(::CPND, ::Number) = 0
     offset_tt2ut1(tt_s::Number)
 
 Return the TT-to-UT1 offset, in seconds, at `tt_s` expressed in TT seconds since J2000.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
 """
 function offset_tt2ut1(tt_s)
 
