@@ -105,6 +105,43 @@ end;
         @test getfield(pa, j) == 0
     end
 
+    # Check that the 1996 models expressions are somewhat close to their 2010A counterparts 
+    # TODO: find an external reference that contains these values for a proper test 
+    
+    ep1 = Epoch("1980-01-01T00:00:00 TDB")
+    ep2 = Epoch("2050-01-01T00:00:00 TDB")
+    epochs = ep1:86400:ep2 
+
+    for i in eachindex(epochs)
+    
+        tdb_c = j2000c(epochs[i])
+
+        x = IERSConventions.pa_venus(iers1996,  tdb_c)
+        y = IERSConventions.pa_venus(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-2
+
+        x = IERSConventions.pa_earth(iers1996,  tdb_c)
+        y = IERSConventions.pa_earth(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-2
+
+        x = IERSConventions.pa_mars(iers1996,  tdb_c)
+        y = IERSConventions.pa_mars(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-1
+
+        x = IERSConventions.pa_jupiter(iers1996,  tdb_c)
+        y = IERSConventions.pa_jupiter(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-1
+
+        x = IERSConventions.pa_saturn(iers1996,  tdb_c)
+        y = IERSConventions.pa_saturn(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-1
+
+        x = IERSConventions.pa_precession(iers1996,  tdb_c)
+        y = IERSConventions.pa_precession(iers2010a, tdb_c)
+        @test r2a*abs(x-y) ≤ 1e-1
+
+    end
+
     # Check error for 1996 models 
     for fcn in (
         IERSConventions.pa_mercury, IERSConventions.pa_uranus, IERSConventions.pa_neptune
