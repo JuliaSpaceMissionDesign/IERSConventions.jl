@@ -53,7 +53,8 @@ function eop_unload_data!()
 
     IERS_EOP_DATA.filename = ""
     IERS_EOP.init = false
-    
+
+    @info "EOP data successfully unloaded."
     nothing 
 
 end
@@ -70,7 +71,7 @@ function eop_set_data!(m::IERSModel, filename)
     oldfile = IERS_EOP_DATA.filename
     days_utc, days_tt, xp, yp, ut1_tt, lod, δX, δY, δΔψ, δΔϵ = eop_read_data(filename)
 
-    if (!isempty(IERS_EOP_DATA.days_UTC))
+    if (!isempty(oldfile))
         @warn "Existing EOP data from \'$(oldfile)\' will be overwritten by \'$(filename)\'."
     end
 
