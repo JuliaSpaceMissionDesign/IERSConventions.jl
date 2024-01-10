@@ -2,7 +2,7 @@
 export eop_load_data!, eop_unload_data!
 
 """
-    eop_load_data!(filename, m::IERS2010)
+    eop_load_data!(m::IERS2010, filename)
 
 Initialise the Earth Orientation Parameters (EOP) from a dedicated JSMD `.eop.dat` file.
 
@@ -10,10 +10,10 @@ Initialise the Earth Orientation Parameters (EOP) from a dedicated JSMD `.eop.da
     Currently, only EOP data associated to the IAU2006/2000A precession-nutation model 
     is supported.
 """
-function eop_load_data!(filename, m::IERS2010)
+function eop_load_data!(m::IERS2010, filename)
 
     # Set the EOP data 
-    eop_set_data!(filename, m)
+    eop_set_data!(m, filename)
 
     # Initialise the interpolators 
     IERS_EOP.init = true 
@@ -60,12 +60,12 @@ end
 
 
 """
-    eop_set_data!(filename, m::IERSModel)  
+    eop_set_data!(m::IERSModel, filename)  
 
 Set Earth Orientation Parameters (EOP) to be used for frames transformations from a JSMD 
 `.eop.dat` file, given a reference model `m`.
 """
-function eop_set_data!(filename, m::IERSModel)
+function eop_set_data!(m::IERSModel, filename)
 
     oldfile = IERS_EOP_DATA.filename
     days_utc, days_tt, xp, yp, ut1_tt, lod, δX, δY, δΔψ, δΔϵ = eop_read_data(filename)

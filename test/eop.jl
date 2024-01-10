@@ -340,11 +340,11 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
         @test repr(IERSConventions.IERS_EOP) == "EOPInterpolator(init=false)\n"
 
         dummy_eop = joinpath(test_dir, "eop", "txt", "finals.data")
-        @test_throws ArgumentError eop_load_data!(dummy_eop, iers2010a)
+        @test_throws ArgumentError eop_load_data!(iers2010a, dummy_eop)
 
         @info "Initialising EOP data"
         eop_file = joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat")
-        eop_load_data!(eop_file, iers2010a)
+        eop_load_data!(iers2010a, eop_file)
 
         # Test unloading of EOP data 
         eop_unload_data!()
@@ -352,7 +352,7 @@ get_row(data, mjd) = findfirst(x -> x >= mjd, data[:, 1])
         @test_throws ErrorException eop_filename()
         @test_throws ErrorException IERSConventions.eop_δX(iers2010a, 0)
 
-        eop_load_data!(eop_file, iers2010a)
+        eop_load_data!(iers2010a, eop_file)
         @test eop_filename() == eop_file 
 
         str = "EOPData(filename=\"$eop_file\", from: -10227.5 (UTC) to 8741.5 (UTC))\n"

@@ -9,7 +9,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 @testset "Rotations" verbose=true begin 
 
     # Load EOP data
-    eop_load_data!(joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat"), iers2010a)
+    eop_load_data!(iers2010a, joinpath(@__DIR__, "assets", "eopc04_20.1962-now.eop.dat"))
 
     @testset "CIO-based approach" verbose=true begin 
         @testset "CIRF-to-GCRF" verbose=true begin 
@@ -199,7 +199,7 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
 
         # The EOP data is retrieved from the finals2000A file available at this epoch:
         # 2024-01-09T21:00:00 UTC 
-        eop_load_data!(joinpath(@__DIR__, "assets", "finals2000A.data.eop.dat"), iers2010a)
+        eop_load_data!(iers2010a, joinpath(@__DIR__, "assets", "finals2000A.data.eop.dat"))
 
         # Since the USNO matrix calculator does not return matrices with fixed absolute 
         # accuracy (it always displays the coefficients in scientific notation with 9 
