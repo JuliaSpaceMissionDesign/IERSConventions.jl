@@ -97,7 +97,7 @@ function pa_venus(::IERSModel, tdb_c::Number)
 end
 
 function pa_venus(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(181.979800853, 58517.8156748)))
+    return mod2pi(deg2rad(@evalpoly(tdb_c, 181.979800853, 58517.8156748)))
 end
 
 
@@ -117,7 +117,7 @@ function pa_earth(::IERSModel, tdb_c::Number)
 end
 
 function pa_earth(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(100.466448494, 35999.3728521)))
+    return mod2pi(deg2rad(@evalpoly(tdb_c, 100.466448494, 35999.3728521)))
 end
 
 
