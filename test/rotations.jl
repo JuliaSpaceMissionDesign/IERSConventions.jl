@@ -71,6 +71,13 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
             data = readdlm(joinpath(test_dir, "obspm-cio", "obspm-era.txt"); skipstart=2)
             n = length(axes(data, 1))
 
+            # In this test we have a residual error of about 20 μas with respect to the 
+            # calculator of the IERS website. These differences are due to interpolation
+            # errors of about 1e-6 seconds (here ΔUT1 is manually extracted). Nevertheless, 
+            # the average error of that parameter is of about 7 microseconds, which causes 
+            # results in differences of about 100 μas (so the interpolation error is below
+            # the model accuracy anyway).
+
             for j = 1:n 
                 row = data[j, :]
 
