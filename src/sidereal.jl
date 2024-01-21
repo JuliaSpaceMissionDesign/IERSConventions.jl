@@ -141,17 +141,9 @@ function eeq_complementary(m::IERS1996, tt_c::Number)
     # Compute the longitude of the ascending node of the Moon
     Ω = delaunay_longitude_node(m, tt_c)
 
-    # Compute complementary terms 
-    eeq = arcsec2rad(0.00264*sin(Ω) + 0.000063*sin(2Ω))
-
-    # The IAU 1994 C7 resolution added two more terms to the equation of the equinoxes 
+    # Compute complementary terms added with IAU 1994 C7 resolution
     # that are to be used from 1997-02-27T00:00:00 UTC   
-    
-    # The value of that date in TT Julian centuries since J2000 is: 
-    t_ref = -8.9726337816e7/Tempo.CENTURY2SEC
-
-    # Guarantees type stability
-    return tt_c < t_ref ? 0*eeq : eeq 
+    return arcsec2rad(0.00264*sin(Ω) + 0.000063*sin(2Ω))
 
 end
 
