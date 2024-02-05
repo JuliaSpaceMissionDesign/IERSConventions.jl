@@ -5,10 +5,6 @@ export eop_load_data!, eop_unload_data!
     eop_load_data!(m::IERS2010, filename)
 
 Initialise the Earth Orientation Parameters (EOP) from a dedicated JSMD `.eop.dat` file.
-
-!!! note 
-    Currently, only EOP data associated to the IAU2006/2000A precession-nutation model 
-    is supported.
 """
 function eop_load_data!(m::IERSModel, filename)
 
