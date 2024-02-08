@@ -67,6 +67,7 @@ IERSConventions.eop_δX
 IERSConventions.eop_δY
 IERSConventions.eop_xp
 IERSConventions.eop_yp
+IERSConventions.eop_lod
 IERSConventions.offset_tt2ut1
 ```
 

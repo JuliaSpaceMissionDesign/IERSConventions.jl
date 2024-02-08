@@ -38,6 +38,10 @@ iers_rot3_gcrf_to_itrf
 iers_rot3_gcrf_to_tirf 
 iers_rot3_itrf_to_cirf 
 iers_rot3_itrf_to_tirf
+
+iers_rot6_gcrf_to_itrf
+iers_rot9_gcrf_to_itrf
+iers_rot12_gcrf_to_itrf
 ```
 
 ### Equinox-based rotations 
@@ -78,6 +82,7 @@ cip_vector
 ```@docs 
 iers_era 
 iers_era_rotm 
+iers_earth_rot_rate
 
 iers_gmst 
 iers_gast 
