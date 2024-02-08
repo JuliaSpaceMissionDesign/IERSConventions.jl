@@ -212,6 +212,27 @@ eop_yp(::CPND, ::Number) = 0
 
 
 """
+    eop_lod(m::IERSModel, tt_c::Number)
+
+Interpolate and retrieve the length of day `LOD` offset, in seconds, at time `tt_c` expressed in 
+`TT` Julian centuries since J2000 for the IERS convention `m`.
+
+!!! note 
+    If time is outside the boundaries for which there is available EOP data, a zero
+    value is returned.
+"""
+function eop_lod(::IERSModel, tt_c::Number)
+    if eop_check_time(tt_c)        
+        return π/648000*interpolate(IERS_EOP.lod, tt_c, false)
+    else
+        return 0.0*zero(tt_c)
+    end 
+end
+
+eop_lod(::CPND, ::Number) = 0
+
+
+"""
     offset_tt2ut1(tt_s::Number)
 
 Return the TT-to-UT1 offset, in seconds, at `tt_s` expressed in TT seconds since J2000.

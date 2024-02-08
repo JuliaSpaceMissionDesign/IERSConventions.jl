@@ -20,6 +20,7 @@ end;
 @testset "IERSConventions" verbose=true begin 
 
     include("eop.jl")
+    include("rate.jl")
 
     include("fa.jl")
     include("bpn.jl")

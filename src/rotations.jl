@@ -10,7 +10,11 @@ export  iers_rot3_gcrf_to_mod,
         iers_rot3_gcrf_to_itrf,
         iers_rot3_gcrf_to_tirf, 
         iers_rot3_itrf_to_cirf, 
-        iers_rot3_itrf_to_tirf
+        iers_rot3_itrf_to_tirf,
+
+        iers_rot6_gcrf_to_itrf,
+        iers_rot9_gcrf_to_itrf,
+        iers_rot12_gcrf_to_itrf
 
 # Equinox-based transformations from GCRF
 # ==============================================
@@ -356,6 +360,123 @@ function iers_rot3_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
 
     return W*RQ
 
+end
+
+"""
+    iers_rot6_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+Compute the rotation matrix and its derivative from the Geocentric Celestial Reference Frame 
+(GCRF) to the International Terrestrial Reference Frame (ITRF) at time `tt_s`, expressed 
+in TT seconds since `J2000`, following the IERS Conventions `m`. 
+
+!!! note 
+    EOP corrections to the CIP coordinates (δX, δY) are only added in the [`iers2003a`](@ref)
+    and [`iers2010a`](@ref) models.
+
+!!! note 
+    Polar motion is neglected in the [`CPNd`](@ref) model. 
+
+### References 
+- IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
+"""
+function iers_rot6_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+    RQ = iers_rot3_gcrf_to_tirf(tt_s, m)
+
+    ttc = tt_s/Tempo.CENTURY2SEC
+
+    # Retrieve pole coordinates 
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
+    LOD = eop_lod(m, ttc)
+
+    ωe = SVector(0.0, 0.0, iers_earth_rot_rate(LOD))
+    Ω = -skew(ωe)
+
+    # Compute the polar motion rotation
+    W = iers_polar_motion(m, xₚ, yₚ, ttc)
+
+    return W*RQ, W*Ω*RQ
+
+end
+
+"""
+    iers_rot9_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+Compute the rotation matrix, its first and second derivative from the Geocentric Celestial 
+Reference Frame (GCRF) to the International Terrestrial Reference Frame (ITRF) at time 
+`tt_s`, expressed in TT seconds since `J2000`, following the IERS Conventions `m`. 
+
+!!! note 
+    EOP corrections to the CIP coordinates (δX, δY) are only added in the [`iers2003a`](@ref)
+    and [`iers2010a`](@ref) models.
+
+!!! note 
+    Polar motion is neglected in the [`CPNd`](@ref) model. 
+
+### References 
+- IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
+"""
+function iers_rot9_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+    RQ = iers_rot3_gcrf_to_tirf(tt_s, m)
+
+    ttc = tt_s/Tempo.CENTURY2SEC
+
+    # Retrieve pole coordinates 
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
+    LOD = eop_lod(m, ttc)
+
+    ωe = SVector(0.0, 0.0, iers_earth_rot_rate(LOD))
+    Ω = -skew(ωe)
+
+    # Compute the polar motion rotation
+    W = iers_polar_motion(m, xₚ, yₚ, ttc)
+
+    ΩRW = Ω*RQ
+
+    return W*RQ, W*ΩRW, W*Ω*ΩRW
+end
+
+"""
+    iers_rot12_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+Compute the rotation matrix, its first, second and third derivative from the Geocentric 
+Celestial Reference Frame (GCRF) to the International Terrestrial Reference Frame (ITRF) 
+at time `tt_s`, expressed in TT seconds since `J2000`, following the IERS Conventions `m`. 
+
+!!! note 
+    EOP corrections to the CIP coordinates (δX, δY) are only added in the [`iers2003a`](@ref)
+    and [`iers2010a`](@ref) models.
+
+!!! note 
+    Polar motion is neglected in the [`CPNd`](@ref) model. 
+
+### References 
+- IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
+"""
+function iers_rot12_gcrf_to_itrf(tt_s::Number, m::IERSModel=iers2010b)
+
+    RQ = iers_rot3_gcrf_to_tirf(tt_s, m)
+
+    ttc = tt_s/Tempo.CENTURY2SEC
+
+    # Retrieve pole coordinates 
+    xₚ = eop_xp(m, ttc)
+    yₚ = eop_yp(m, ttc)
+    LOD = eop_lod(m, ttc)
+
+    ωe = SVector(0.0, 0.0, iers_earth_rot_rate(LOD))
+    Ω = -skew(ωe)
+
+    # Compute the polar motion rotation
+    W = iers_polar_motion(m, xₚ, yₚ, ttc)
+
+    ΩRW = Ω*RQ
+    Ω²RW = Ω*ΩRW
+
+    return W*RQ, W*ΩRW, W*Ω²RW, W*Ω*Ω²RW
 end
 
 

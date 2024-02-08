@@ -7,7 +7,7 @@ module IERSConventions
 
     using Tempo
     using JSMDInterfaces.Math: AbstractInterpolationMethod, interpolate
-    using JSMDUtils.Math: InterpAkima, arcsec2rad
+    using JSMDUtils.Math: InterpAkima, arcsec2rad, skew
 
     # Basic definitions
     include("models.jl")
@@ -40,6 +40,7 @@ module IERSConventions
     include("eop/retrieval.jl")
 
     # Rotation functions 
+    include("rate.jl")
     include("rotations.jl")
 
     # Package precompilation

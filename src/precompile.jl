@@ -30,6 +30,10 @@ PrecompileTools.@setup_workload begin
             iers_rot3_itrf_to_cirf(t, m) 
             iers_rot3_itrf_to_tirf(t, m)
 
+            iers_rot6_gcrf_to_itrf(t, m)
+            iers_rot9_gcrf_to_itrf(t, m)
+            iers_rot12_gcrf_to_itrf(t, m)
+
             iers_bias(m, t)
             iers_precession(m, t)
 

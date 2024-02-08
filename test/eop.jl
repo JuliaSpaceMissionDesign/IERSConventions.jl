@@ -389,6 +389,8 @@ end
                 @test IERSConventions.eop_xp(iers2010a, t) == 0
                 @test IERSConventions.eop_yp(iers2010a, t) == 0
 
+                @test IERSConventions.eop_lod(iers2010a, t) == 0
+
                 @test IERSConventions.offset_tt2ut1(t*Tempo.CENTURY2SEC) == 0
 
             end
