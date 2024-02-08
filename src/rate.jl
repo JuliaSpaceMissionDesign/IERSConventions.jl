@@ -1,3 +1,5 @@
+export iers_earth_rot_rate
+
 # Nominal Earth angular velocity  
 const ωₑ = 7.292_115_146_706_979e-5
 
