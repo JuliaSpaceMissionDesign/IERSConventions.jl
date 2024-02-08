@@ -19,7 +19,7 @@ See also [`iers_era_rotm`](@ref).
 """
 function iers_era(::IERSModel, ut1_d::Number)
 
-    # The function uses the fractional UT1 date to gain additional iers_bias_precession_nutation
+    # The function uses the fractional UT1 date to gain additional precision
     # in the computations
     return mod2pi(2π * (mod(ut1_d, 1) + 0.7790572732640 + 0.00273781191135448ut1_d))
 
