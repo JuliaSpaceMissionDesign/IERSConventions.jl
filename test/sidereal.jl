@@ -1,7 +1,8 @@
 
-r2a = 180 / π * 3600
 
 @testset "Sidereal Time" verbose=true begin 
+    
+    r2a = 180 / π * 3600
 
     for _ in 1:50 
 
