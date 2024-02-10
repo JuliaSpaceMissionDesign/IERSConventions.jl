@@ -376,6 +376,9 @@ in TT seconds since `J2000`, following the IERS Conventions `m`.
 !!! note 
     Polar motion is neglected in the [`CPNd`](@ref) model. 
 
+!!! note 
+    The time derivative of the nutation and precession effects is neglected.
+
 ### References 
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
 """
@@ -413,6 +416,9 @@ Reference Frame (GCRF) to the International Terrestrial Reference Frame (ITRF) a
 
 !!! note 
     Polar motion is neglected in the [`CPNd`](@ref) model. 
+
+!!! note 
+    The time derivative of the nutation and precession effects is neglected.
 
 ### References 
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 
@@ -452,6 +458,9 @@ at time `tt_s`, expressed in TT seconds since `J2000`, following the IERS Conven
 
 !!! note 
     Polar motion is neglected in the [`CPNd`](@ref) model. 
+
+!!! note 
+    The time derivative of the nutation and precession effects is neglected.
 
 ### References 
 - IERS Technical Note No. [36](https://www.iers.org/IERS/EN/Publications/TechnicalNotes/tn36.html) 

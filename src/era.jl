@@ -18,10 +18,12 @@ since `J2000`, according to the IERS convention `m`.
 See also [`iers_era_rotm`](@ref).
 """
 function iers_era(::IERSModel, ut1_d::Number)
-
     # The function uses the fractional UT1 date to gain additional precision
     # in the computations
-    return mod2pi(2π * (mod(ut1_d, 1) + 0.7790572732640 + 0.00273781191135448ut1_d))
+
+    # Uses integer divsion because the `mod` and `rem` functions don't work with ForwardDiff
+    f = ut1_d - (ut1_d ÷ 1)
+    return rem2pi(2π * (f + 0.7790572732640 + 0.00273781191135448ut1_d), RoundDown)
 
 end
 

@@ -179,12 +179,46 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                 Rc = iers_rot3_gcrf_to_itrf(j2000s(ep_tt), CPNc)'
                 Rd = iers_rot3_gcrf_to_itrf(j2000s(ep_tt), CPNd)' 
 
+                # Test higher order rotations 
+                R1, dR1 = iers_rot6_gcrf_to_itrf(j2000s(ep_tt), iers2010a)
+                R2, dR2, ddR2 = iers_rot9_gcrf_to_itrf(j2000s(ep_tt), iers2010a)
+                R3, dR3, ddR3, dddR3 = iers_rot12_gcrf_to_itrf(j2000s(ep_tt), iers2010a)
+
+                dR = derivative(t->iers_rot3_gcrf_to_itrf(t, iers2010a), j2000s(ep_tt))
+                ddR = derivative(
+                    t->derivative(τ->iers_rot3_gcrf_to_itrf(τ, iers2010a), t),
+                    j2000s(ep_tt)
+                )
+
+                dddR = derivative(
+                    t->derivative(
+                        τ->derivative(κ->iers_rot3_gcrf_to_itrf(κ, iers2010a), τ),
+                        t
+                    ),
+                    j2000s(ep_tt)
+                )
+
+                @test all(abs.(dR1 - dR) .≤ 1e-11)
+                @test all(abs.(dR2 - dR) .≤ 1e-11)
+                @test all(abs.(dR3 - dR) .≤ 1e-11)
+
+                @test all(abs.(ddR2 - ddR) .≤ 1e-13)
+                @test all(abs.(ddR3 - ddR) .≤ 1e-13)
+
+                @test all(abs.(dddR3 - dddR) .≤ 1e-15)
+
                 for _ in 1:10
+
                     v = rand(BigFloat, 3)
+
                     @test v2as(R*v, Ra*v) ≤ 20e-6
                     @test v2as(Ra*v, Rb*v) ≤ 3e-3
                     @test v2as(Ra*v, Rc*v) ≤ 50e-3
                     @test v2as(Ra*v, Rd*v) ≤ 2
+
+                    @test v2as(R1'*v, Ra*v) ≤ 20e-6  
+                    @test v2as(R2'*v, Ra*v) ≤ 20e-6  
+                    @test v2as(R3'*v, Ra*v) ≤ 20e-6  
 
                 end
 
