@@ -118,8 +118,9 @@ end
 # t = TT Julian centuries since J2000 
 function iers_gmst(::IERS1996, tt_c::Number)
 
-    # Transform from TT centuries to UT1 centuries
+    # Transform from TT centuries to UT1 centuries and days
     ut1_c = tt_c + offset_tt2ut1(tt_c*Tempo.CENTURY2SEC)/Tempo.CENTURY2SEC
+    ut1_d = ut1_c*Tempo.CENTURY2DAY
 
     # Coefficients for the IAU 1982 GMST-UT1 model. The first component has been adjusted 
     # of 12 hours because the input is defined with respect to noon of 01-01-2000
@@ -129,10 +130,10 @@ function iers_gmst(::IERS1996, tt_c::Number)
     D = -6.2e-6
 
     # Fractional part of UT1, in seconds
-    f = Tempo.DAY2SEC*mod(ut1_c*Tempo.CENTURY2DAY, 1)
+    f = Tempo.DAY2SEC*(ut1_d - (ut1_d ÷ 1))
 
     # Compute GMST
-    return mod2pi(2π/86400*(@evalpoly(ut1_c, A, B, C, D) + f))
+    return rem2pi(2π/86400*(@evalpoly(ut1_c, A, B, C, D) + f), RoundDown)
 
 end
 
@@ -164,7 +165,7 @@ function iers_gmst(::IERS2003, tt_c::Number, θ::Number)
     )
 
     # Compute GMST 
-    return mod2pi(θ + arcsec2rad(p))
+    return rem2pi(θ + arcsec2rad(p), RoundDown)
 
 end
 
@@ -190,6 +191,6 @@ function iers_gmst(::IERS2010, tt_c::Number, θ::Number)
     )
 
     # Compute GMST 
-    return mod2pi(θ + arcsec2rad(p))
+    return rem2pi(θ + arcsec2rad(p), RoundDown)
     
 end

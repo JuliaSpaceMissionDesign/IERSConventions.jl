@@ -49,20 +49,24 @@ centuries since J2000.
 """
 function delaunay_anomaly_moon(::IERSAModels, tdb_c::Number)
     # This expression is valid for both IERS2003 and IERS2010
-    mod2pi(
-        arcsec2rad(
-            @evalpoly(tdb_c, 485868.249036, 1717915923.2178, 31.8792, 0.051635, -0.00024470)
+    arcsec2rad(
+        jrem(
+            @evalpoly(tdb_c, 485868.249036, 1717915923.2178, 31.8792, 0.051635, -0.00024470), 
+            1296000
         )
     )
 end
 
 function delaunay_anomaly_moon(::IERSModel, tdb_c::Number)
-    arcsec2rad(mod(485868.249036 + 1717915923.2178tdb_c, 1296000))
+    arcsec2rad(jrem(485868.249036 + 1717915923.2178tdb_c, 1296000))
 end
 
 function delaunay_anomaly_moon(::IERS1996, tdb_c::Number)
-    r = mod(1325tdb_c, 1)
-    mod2pi(arcsec2rad(@evalpoly(tdb_c, 485866.733, 715922.633, 31.310, 0.064)) + 2π*r)
+    r = jrem(1325tdb_c, 1)
+    rem2pi(
+        arcsec2rad(@evalpoly(tdb_c, 485866.733, 715922.633, 31.310, 0.064)) + 2π*r, 
+        RoundNearest
+    )
 end
 
 
@@ -73,20 +77,24 @@ Compute the mean anomaly of the Sun, in radians, given time `tdb_c` expressed in
 centuries since J2000.
 """
 function delaunay_anomaly_sun(::IERSAModels, tdb_c::Number)
-    mod2pi(
-        arcsec2rad(
-            @evalpoly(tdb_c, 1287104.793048, 129596581.0481, -0.5532, 0.000136, -0.00001149)
+    arcsec2rad(
+        jrem(
+            @evalpoly(tdb_c, 1287104.793048, 129596581.0481, -0.5532, 0.000136, -0.00001149), 
+            1296000
         )
     )
 end
 
 function delaunay_anomaly_sun(::IERSModel, tdb_c::Number)
-    arcsec2rad(mod(1287104.79305 + 129596581.0481tdb_c, 1296000))
+    arcsec2rad(jrem(1287104.79305 + 129596581.0481tdb_c, 1296000))
 end
 
 function delaunay_anomaly_sun(::IERS1996, tdb_c::Number)
-    r = mod(99tdb_c, 1)
-    mod2pi(arcsec2rad(@evalpoly(tdb_c, 1287099.804, 1292581.224, -0.577, -0.012)) + 2π*r)
+    r = jrem(99tdb_c, 1)
+    rem2pi(
+        arcsec2rad(@evalpoly(tdb_c, 1287099.804, 1292581.224, -0.577, -0.012)) + 2π*r, 
+        RoundNearest
+    )
 end
 
 
@@ -97,20 +105,24 @@ Compute the difference between the longitude of the Moon and the longitude of th
 node, in radians, given time `tdb_c` expressed in TDB Julian centuries since J2000.
 """
 function delaunay_longitude_diff(::IERSAModels, tdb_c::Number)
-    mod2pi(
-        arcsec2rad(
-            @evalpoly(tdb_c, 335779.526232, 1739527262.8478, -12.7512, -0.001037, +0.00000417)
+    arcsec2rad(
+        jrem(
+            @evalpoly(tdb_c, 335779.526232, 1739527262.8478, -12.7512, -0.001037, 0.00000417), 
+            1296000
         )
     )
 end
 
 function delaunay_longitude_diff(::IERSModel, tdb_c::Number)
-    arcsec2rad(mod(335779.526232 + 1739527262.8478tdb_c, 1296000))
+    arcsec2rad(jrem(335779.526232 + 1739527262.8478tdb_c, 1296000))
 end
 
 function delaunay_longitude_diff(::IERS1996, tdb_c::Number)
-    r = mod(1342tdb_c, 1)
-    mod2pi(arcsec2rad(@evalpoly(tdb_c, 335778.877, 295263.137, -13.257, 0.011)) + 2π*r)
+    r = jrem(1342tdb_c, 1)
+    rem2pi(
+        arcsec2rad(@evalpoly(tdb_c, 335778.877, 295263.137, -13.257, 0.011)) + 2π*r, 
+        RoundNearest
+    )
 end
 
 """
@@ -120,20 +132,24 @@ Compute the mean elongation of the Moon from the Sun, in radians, given time `td
 TDB Julian centuries since J2000.
 """
 function delaunay_elongation_moon(::IERSAModels, tdb_c::Number)
-    mod2pi(
-        arcsec2rad(
-            @evalpoly(tdb_c, 1072260.703692, 1602961601.2090, -6.3706, 0.006593, -0.00003169)
+    arcsec2rad(
+        jrem(
+            @evalpoly(tdb_c, 1072260.703692, 1602961601.2090, -6.3706, 0.006593, -0.00003169), 
+            1296000
         )
     )
 end
 
 function delaunay_elongation_moon(::IERSModel, tdb_c::Number)
-    arcsec2rad(mod(1072260.70369 + 1602961601.2090tdb_c, 1296000))
+    arcsec2rad(jrem(1072260.70369 + 1602961601.2090tdb_c, 1296000))
 end
 
 function delaunay_elongation_moon(::IERS1996, tdb_c::Number)
-    r = mod(1236tdb_c, 1)
-    mod2pi(arcsec2rad(@evalpoly(tdb_c, 1072261.307, 1105601.328, -6.891, 0.019)) + 2π*r)
+    r = jrem(1236tdb_c, 1)
+    rem2pi(
+        arcsec2rad(@evalpoly(tdb_c, 1072261.307, 1105601.328, -6.891, 0.019)) + 2π*r, 
+        RoundNearest
+    )
 end
 
 """
@@ -144,18 +160,26 @@ measured from the mean equinox of date, in radians, given time `tdb_c` expressed
 centuries since J2000.
 """
 function delaunay_longitude_node(::IERSAModels, tdb_c::Number)
-    mod2pi(
-        arcsec2rad(
-            @evalpoly(tdb_c, 450160.398036, -6962890.5431, 7.4722, 0.007702, -0.00005939)
+    arcsec2rad(
+        jrem(
+            @evalpoly(tdb_c, 450160.398036, -6962890.5431, 7.4722, 0.007702, -0.00005939), 
+            1296000
         )
     )
 end
 
 function delaunay_longitude_node(::IERSModel, tdb_c::Number)
-    arcsec2rad(mod(450160.398036 - 6962890.5431tdb_c, 1296000))
+    arcsec2rad(jrem(450160.398036 - 6962890.5431tdb_c, 1296000))
 end
 
 function delaunay_longitude_node(::IERS1996, tdb_c::Number)
-    r = mod(-5tdb_c, 1)
-    mod2pi(arcsec2rad(@evalpoly(tdb_c, 450160.280, -482890.539, 7.455, 0.008)) + 2π*r)
+    r = jrem(-5tdb_c, 1)
+    rem2pi(
+        arcsec2rad(@evalpoly(tdb_c, 450160.280, -482890.539, 7.455, 0.008)) + 2π*r, 
+        RoundNearest
+    )
 end
+
+
+jrem(x, y) = x - y*(x ÷ y)
+jrem2pi(x) = jrem(x, 2π)
