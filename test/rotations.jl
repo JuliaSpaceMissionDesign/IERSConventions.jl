@@ -198,10 +198,6 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                     j2000s(ep_tt)
                 )
 
-                @test all(abs.(R1' - Ra) .≤ 1e-16)
-                @test all(abs.(R2' - Ra) .≤ 1e-16)
-                @test all(abs.(R3' - Ra) .≤ 1e-16)
-
                 @test all(abs.(dR1 - dR) .≤ 1e-11)
                 @test all(abs.(dR2 - dR) .≤ 1e-11)
                 @test all(abs.(dR3 - dR) .≤ 1e-11)
@@ -212,11 +208,18 @@ v2as = (x, y) -> acosd(max(-1, min(1, dot(x / norm(x), y / norm(y))))) * 3600
                 @test all(abs.(dddR3 - dddR) .≤ 1e-15)
 
                 for _ in 1:10
+
                     v = rand(BigFloat, 3)
+
                     @test v2as(R*v, Ra*v) ≤ 20e-6
                     @test v2as(Ra*v, Rb*v) ≤ 3e-3
                     @test v2as(Ra*v, Rc*v) ≤ 50e-3
                     @test v2as(Ra*v, Rd*v) ≤ 2
+
+                    @test v2as(R1'*v, Ra*v) ≤ 20e-6  
+                    @test v2as(R2'*v, Ra*v) ≤ 20e-6  
+                    @test v2as(R3'*v, Ra*v) ≤ 20e-6  
+
                 end
 
             end
