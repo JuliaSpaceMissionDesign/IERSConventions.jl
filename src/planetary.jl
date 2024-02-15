@@ -68,7 +68,7 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fame03.c) software library
 """
 function pa_mercury(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 4.402608842, 2608.7903141574))
+    return rem2pi(@evalpoly(tdb_c, 4.402608842, 2608.7903141574), RoundNearest)
 end
 
 function pa_mercury(::IERS1996, ::Number)
@@ -93,11 +93,11 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fave03.c) software library
 """
 function pa_venus(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 3.176146697, 1021.3285546211))
+    return rem2pi(@evalpoly(tdb_c, 3.176146697, 1021.3285546211), RoundNearest)
 end
 
 function pa_venus(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 181.979800853, 58517.8156748)))
+    return rem2pi(deg2rad(@evalpoly(tdb_c, 181.979800853, 58517.8156748)), RoundNearest)
 end
 
 
@@ -113,11 +113,11 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fae03.c) software library
 """
 function pa_earth(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 1.753470314, 628.3075849991))
+    return rem2pi(@evalpoly(tdb_c, 1.753470314, 628.3075849991), RoundNearest)
 end
 
 function pa_earth(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 100.466448494, 35999.3728521)))
+    return rem2pi(deg2rad(@evalpoly(tdb_c, 100.466448494, 35999.3728521)), RoundNearest)
 end
 
 
@@ -133,11 +133,11 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fama03.c) software library
 """
 function pa_mars(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 6.203480913, 334.0612426700))
+    return rem2pi(@evalpoly(tdb_c, 6.203480913, 334.0612426700), RoundNearest)
 end
 
 function pa_mars(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 355.433274605, 19140.299314)))
+    return rem2pi(deg2rad(@evalpoly(tdb_c, 355.433274605, 19140.299314)), RoundNearest)
 end
 
 
@@ -153,11 +153,11 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/faju03.c) software library
 """
 function pa_jupiter(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 0.599546497, 52.9690962641))
+    return rem2pi(@evalpoly(tdb_c, 0.599546497, 52.9690962641), RoundNearest)
 end
 
 function pa_jupiter(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 34.3514839, 3034.90567464)))
+    return rem2pi(deg2rad(@evalpoly(tdb_c, 34.3514839, 3034.90567464)), RoundNearest)
 end
 
 
@@ -173,11 +173,11 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fasa03.c) software library
 """
 function pa_saturn(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 0.874016757, 21.3299104960))
+    return rem2pi(@evalpoly(tdb_c, 0.874016757, 21.3299104960), RoundNearest)
 end
 
 function pa_saturn(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 50.0774713998, 1222.11379404)))
+    return rem2pi(deg2rad(@evalpoly(tdb_c, 50.0774713998, 1222.11379404)), RoundNearest)
 end
 
 
@@ -196,7 +196,7 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/faur03.c) software library
 """
 function pa_uranus(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 5.481293872, 7.4781598567))
+    return rem2pi(@evalpoly(tdb_c, 5.481293872, 7.4781598567), RoundNearest)
 end
 
 function pa_uranus(::IERS1996, ::Number)
@@ -224,7 +224,7 @@ Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fane03.c) software library
 """
 function pa_neptune(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 5.311886287, 3.8133035638))
+    return rem2pi(@evalpoly(tdb_c, 5.311886287, 3.8133035638), RoundNearest)
 end
 
 function pa_neptune(::IERS1996, ::Number)
@@ -249,9 +249,9 @@ expressed in `TDB` Julian centuries since `J2000`.
 - [ERFA](https://github.com/liberfa/erfa/blob/master/src/fapa03.c) software library
 """
 function pa_precession(::IERSModel, tdb_c::Number)
-    return mod2pi(@evalpoly(tdb_c, 0, 0.024381750, 0.00000538691))
+    return jrem2pi(@evalpoly(tdb_c, 0, 0.024381750, 0.00000538691))
 end
 
 function pa_precession(::IERS1996, tdb_c::Number)
-    return mod2pi(deg2rad(@evalpoly(tdb_c, 0, 1.39697137214, 0.0003086)))
+    return jrem2pi(deg2rad(@evalpoly(tdb_c, 0, 1.39697137214, 0.0003086)))
 end

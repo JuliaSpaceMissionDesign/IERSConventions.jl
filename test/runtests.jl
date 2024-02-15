@@ -4,6 +4,7 @@ using Test
 
 using DelimitedFiles
 using ERFA 
+using ForwardDiff: derivative
 using LazyArtifacts
 using LinearAlgebra
 using ReferenceFrameRotations
