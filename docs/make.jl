@@ -1,8 +1,13 @@
 using Documenter, IERSConventions
-using Pkg 
+using Pkg
 
 const CI = get(ENV, "CI", "false") == "true"
 
+if CI
+    Pkg.add("Literate")
+end
+
+include("generate.jl")
 
 makedocs(;
     authors="Julia Space Mission Design Development Team",
@@ -12,14 +17,11 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "Tutorials" => [
-            "01 - Introduction" => "tutorials/t01_intro.md"
-        ], 
-
-        "Benchmarks" => "benchmarks.md",
-        
+            "01 - Loading EOPs" => "Tutorials/gen/t01_load.md"
+        ],
         "API" => [
-            "Public API" => "api/api.md",
-            "Low-level API" => "api/lapi.md"
+            "Public API" => "API/api.md",
+            "Low-level API" => "API/lapi.md"
         ]
     ],
     clean=true,

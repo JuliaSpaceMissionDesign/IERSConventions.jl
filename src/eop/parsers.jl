@@ -37,10 +37,10 @@ function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
     # Multiplicative factor to bring all quantities to seconds/arcseconds, since in the 
     # rapid data series the LOD is given in milliseconds, and the dX, dY, dPsi and dEps 
     # corrections are in milliarcseconds. 
-    fct = isfinal ? 1e-3 : 1.0 
-    
+    fct = isfinal ? 1e-3 : 1.0
+
     # Read the data in the file 
-    data, labels = readdlm(inputfile, ';'; header=true)   
+    data, labels = readdlm(inputfile, ';'; header=true)
     headers = collect(String.(labels[:]))
 
     # Instead of relying on fixed column indexes, we retrieve the column ID associated 
@@ -50,12 +50,12 @@ function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
     cols = ["MJD", "LOD", "UT1-UTC", "x_pole", "y_pole", "dX", "dY", "dPsi", "dEpsilon"]
 
     idxs = zeros(Int, length(cols))
-    for (j, label) in enumerate(cols) 
+    for (j, label) in enumerate(cols)
         # Check whether a valid index has been found! 
-        idx  = findfirst(headers .== label)
+        idx = findfirst(headers .== label)
         if !isnothing(idx)
             idxs[j] = idx
-        else 
+        else
             throw(
                 ErrorException(
                     "Unsupported or invalid EOP file. Could not find the '$(label)' column."
@@ -68,62 +68,62 @@ function eop_generate_from_csv(m::IERSModel, inputfile, outputfile)
     # the other parameters usually end before. 
     last_row = findlast(!isempty, @view(data[:, idxs[3]]))
 
-    mjd  = convert(Vector{Float64}, @view(data[1:last_row, idxs[1]]))
+    mjd = convert(Vector{Float64}, @view(data[1:last_row, idxs[1]]))
 
     # Currently discard all data for dates before 1 January 1972 UTC, since the TAI-UTC 
     # transformation is undefined. 
-    mjd_1972  = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
+    mjd_1972 = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
     first_row = findfirst(x -> x >= mjd_1972, mjd)
 
     Δut1 = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[3]]))
 
     # Convert UTC days to TT centuries (for the corrections conversion)
-    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD 
-    days_tai = map(t->Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
-    cent_tt  = (days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC)/Tempo.CENTURY2DAY
-    
+    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD
+    days_tai = map(t -> Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
+    cent_tt = (days_tai .+ Tempo.OFFSET_TAI_TT / Tempo.DAY2SEC) / Tempo.CENTURY2DAY
+
     # Retrieve pole coordinates 
     xp = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[4]]))
     yp = convert(Vector{Float64}, @view(data[first_row:last_row, idxs[5]]))
 
     # Retrieve columns with optional missing data 
     raw_lod = @view(data[first_row:last_row, idxs[2]])
-    raw_δX  = @view(data[first_row:last_row, idxs[6]])
-    raw_δY  = @view(data[first_row:last_row, idxs[7]])
+    raw_δX = @view(data[first_row:last_row, idxs[6]])
+    raw_δY = @view(data[first_row:last_row, idxs[7]])
     raw_δΔψ = @view(data[first_row:last_row, idxs[8]])
     raw_δΔϵ = @view(data[first_row:last_row, idxs[9]])
 
     # Fill missing LOD elements
-    lod = fct*fill_eop_data(raw_lod)
+    lod = fct * fill_eop_data(raw_lod)
 
-    k = π/648000
-    
+    k = π / 648000
+
     # Retrieve the latest rows with valid data  
     lrow_nut = findlast(!isempty, raw_δΔψ)
     if isnothing(lrow_nut)
         # Need to convert CIP into nutation corrections 
-        δX = fct*fill_eop_data(raw_δX)
-        δY = fct*fill_eop_data(raw_δY)
-    
-        corr = map((t, dx, dy)->δcip_to_δnut(m, t, dx*k, dy*k), cent_tt, δX, δY)
-        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
-    
-    else 
+        δX = fct * fill_eop_data(raw_δX)
+        δY = fct * fill_eop_data(raw_δY)
+
+        corr = map((t, dx, dy) -> δcip_to_δnut(m, t, dx * k, dy * k), cent_tt, δX, δY)
+        δΔψ, δΔϵ = map(x -> x[1] / k, corr), map(x -> x[2] / k, corr)
+
+    else
         # Need to convert nutation into CIP corrections
-        δΔψ = fct*fill_eop_data(raw_δΔψ)
-        δΔϵ = fct*fill_eop_data(raw_δΔϵ)
-    
-        corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
-        δX, δY = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+        δΔψ = fct * fill_eop_data(raw_δΔψ)
+        δΔϵ = fct * fill_eop_data(raw_δΔϵ)
+
+        corr = map((t, dp, de) -> δnut_to_δcip(m, t, dp * k, de * k), cent_tt, δΔψ, δΔϵ)
+        δX, δY = map(x -> x[1] / k, corr), map(x -> x[2] / k, corr)
     end
-    
+
     # Write the EOP data to the desired file
     eop_write_data(
         hcat(
-            days_utc, xp, yp, Δut1, 
-            round.(lod; digits=7), round.(δX; digits=7), round.(δY; digits=7), 
+            days_utc, xp, yp, Δut1,
+            round.(lod; digits=7), round.(δX; digits=7), round.(δY; digits=7),
             round.(δΔψ; digits=7), round.(δΔϵ; digits=7)
-        ), 
+        ),
         outputfile
     )
 
@@ -165,12 +165,12 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
         fct = 1.0
     elseif startswith(filename, "finals")
         data, idxs, hascip = parse_eop_txt_finals(inputfile)
-        
+
         # Multiplicative factor to bring all quantities to seconds/arcseconds, since in the 
         # rapid data series the LOD is given in milliseconds, and the dX, dY, dPsi and dEps 
         # corrections are in milliarcseconds. 
         fct = 1e-3
-    else 
+    else
         throw(ArgumentError("Unable to recognise EOP filename pattern."))
     end
 
@@ -179,47 +179,47 @@ function eop_generate_from_txt(m::IERSModel, inputfile, outputfile)
 
     # Currently discard all data for dates before 1 January 1972 UTC, since the TAI-UTC 
     # transformation is undefined. 
-    mjd_1972  = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
+    mjd_1972 = 41317 # j2000(Epoch("1972-01-01T00:00:00 UTC)) + DMJD
     first_row = findfirst(x -> x >= mjd_1972, mjd)
 
-    lod = fct*@view(data[first_row:end, idxs[2]])
+    lod = fct * @view(data[first_row:end, idxs[2]])
     Δut1 = @view(data[first_row:end, idxs[3]])
 
     # Convert UTC days to TT centuries (for the correction conversion)
-    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD 
-    days_tai = map(t->Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
-    cent_tt  = (days_tai .+ Tempo.OFFSET_TAI_TT/Tempo.DAY2SEC)/Tempo.CENTURY2DAY
+    days_utc = @view(mjd[first_row:end]) .- Tempo.DMJD
+    days_tai = map(t -> Tempo.utc2tai(Tempo.DJ2000, t)[2], days_utc)
+    cent_tt = (days_tai .+ Tempo.OFFSET_TAI_TT / Tempo.DAY2SEC) / Tempo.CENTURY2DAY
 
     # Retrieve the pole coordinates 
     xp = @view(data[first_row:end, idxs[4]])
     yp = @view(data[first_row:end, idxs[5]])
 
-    k = π/648000
+    k = π / 648000
 
     # Retrieve the CIP and nutation corrections
     if hascip
-        δX = fct*@view(data[first_row:end, idxs[6]])
-        δY = fct*@view(data[first_row:end, idxs[7]])
+        δX = fct * @view(data[first_row:end, idxs[6]])
+        δY = fct * @view(data[first_row:end, idxs[7]])
 
         # Convert CIP into nutation corrections 
-        corr = map((t, dx, dy)->δcip_to_δnut(m, t, dx*k, dy*k), cent_tt, δX, δY)
-        δΔψ, δΔϵ = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+        corr = map((t, dx, dy) -> δcip_to_δnut(m, t, dx * k, dy * k), cent_tt, δX, δY)
+        δΔψ, δΔϵ = map(x -> x[1] / k, corr), map(x -> x[2] / k, corr)
 
-    else 
-        δΔψ = fct*@view(data[first_row:end, idxs[6]])
-        δΔϵ = fct*@view(data[first_row:end, idxs[7]])
+    else
+        δΔψ = fct * @view(data[first_row:end, idxs[6]])
+        δΔϵ = fct * @view(data[first_row:end, idxs[7]])
 
-        corr = map((t, dp, de)->δnut_to_δcip(m, t, dp*k, de*k), cent_tt, δΔψ, δΔϵ)
-        δX, δY = map(x->x[1]/k, corr), map(x->x[2]/k, corr)
+        corr = map((t, dp, de) -> δnut_to_δcip(m, t, dp * k, de * k), cent_tt, δΔψ, δΔϵ)
+        δX, δY = map(x -> x[1] / k, corr), map(x -> x[2] / k, corr)
     end
 
     # Write the EOP data to the desired file
     eop_write_data(
         hcat(
-            days_utc, xp, yp, Δut1, 
-            round.(lod; digits=7), round.(δX; digits=7), round.(δY; digits=7), 
+            days_utc, xp, yp, Δut1,
+            round.(lod; digits=7), round.(δX; digits=7), round.(δY; digits=7),
             round.(δΔψ; digits=7), round.(δΔϵ; digits=7)
-        ), 
+        ),
         outputfile
     )
 
@@ -229,7 +229,7 @@ function parse_eop_txt_finals(inputfile)
 
     # Retrieve the filename
     filename = splitdir(inputfile)[2]
-    
+
     # Check whether it contains nutation or CIP corrections
     hascip = occursin("2000A", filename)
 
@@ -240,15 +240,15 @@ function parse_eop_txt_finals(inputfile)
     raw_c1, raw_c2 = String[], String[]
 
     # Parse each line one by one and extract the data
-    open(inputfile, "r") do f 
+    open(inputfile, "r") do f
         for line in readlines(f)
             push!(mjd, parse(Float64, line[8:15]))
             push!(raw_xp, replace(line[19:27], " " => ""))
             push!(raw_yp, replace(line[38:46], " " => ""))
-    
+
             push!(raw_Δut1, replace(line[59:68], " " => ""))
             push!(raw_lod, replace(line[80:86], " " => ""))
-    
+
             push!(raw_c1, replace(line[98:106], " " => ""))
             push!(raw_c2, replace(line[117:125], " " => ""))
         end
@@ -256,7 +256,7 @@ function parse_eop_txt_finals(inputfile)
 
     # Assemble a dummy Float64 matrix to store the parsed data
     data = hcat(
-        mjd, 
+        mjd,
         fill_eop_data(raw_lod), fill_eop_data(raw_Δut1),
         fill_eop_data(raw_xp), fill_eop_data(raw_yp),
         fill_eop_data(raw_c1), fill_eop_data(raw_c2)
@@ -269,13 +269,13 @@ function parse_eop_txt_finals(inputfile)
 end
 
 function parse_eop_txt_c04(inputfile)
-    
+
     # Retrieve the filename
     filename = splitdir(inputfile)[2]
 
     # Retrieve ITRF version
     itrfv = parse(Int, filename[8:9])
-    if itrfv == 14 
+    if itrfv == 14
 
         hascip = occursin("IAU2000", filename)
         idxs = [4, 8, 7, 5, 6, 9, 10]
@@ -283,19 +283,19 @@ function parse_eop_txt_c04(inputfile)
         # In this version, the EOP data starts at the 15th row
         data = readdlm(inputfile; header=false, skipstart=14)
 
-    elseif itrfv == 20 
+    elseif itrfv == 20
 
         hascip = true
         idxs = [5, 13, 8, 6, 7, 9, 10]
-        
+
         # Parse the data file. In this version, the header is completely commented
         data = readdlm(inputfile; header=false, comments=true)
 
-    else 
+    else
         throw(ArgumentError("Unsupported ITRF version."))
     end
-    
-    return data, idxs, hascip 
+
+    return data, idxs, hascip
 
 end
 
@@ -303,7 +303,7 @@ end
 """
     eop_write_data(data, output_filename)
 
-Write the EOP data stored in the matrix `data` to a dedicated JSMD `.eop-dat` file.  
+Write the EOP data stored in the matrix `data` to a dedicated JSMD `.eop.dat` file.  
 
 !!! note 
     The `output_filename` should not include the file extension, which is automatically 
@@ -328,13 +328,13 @@ function fill_eop_data(raw_data)
 
     # Find index of the latest raw with valid data 
     lrow = findlast(!isempty, raw_data)
-    isnothing(lrow) && return data 
+    isnothing(lrow) && return data
 
     # Fill the missing elements with null values
     data[1:lrow] = _to_float.(raw_data[1:lrow])
     data[lrow+1:end] .= 0
-    
-    return data 
+
+    return data
 
 end
 
@@ -361,7 +361,7 @@ input and output EOP are given in radians.
 See also [`δcip_to_δnut`](@ref).
 """
 function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
-    
+
     # Compute the precession angles 
     ϵ₀, ψₐ, _, χₐ = precession_angles_rot4(m, t)
 
@@ -369,11 +369,11 @@ function δnut_to_δcip(m::IERSModel, t::Number, δΔψ::Number, δΔϵ::Number)
     se = sin(iers_obliquity(m, t))
     ce = cos(ϵ₀)
 
-    c = ψₐ*ce - χₐ
+    c = ψₐ * ce - χₐ
 
     # Convert nutation corrections 
-    δx = δΔψ*se + c*δΔϵ
-    δy = δΔϵ - c*se*δΔψ
+    δx = δΔψ * se + c * δΔϵ
+    δy = δΔϵ - c * se * δΔψ
 
     return δx, δy
 
@@ -403,12 +403,12 @@ function δcip_to_δnut(m::IERSModel, t::Number, δx::Number, δy::Number)
     se = sin(iers_obliquity(m, t))
     ce = cos(ϵ₀)
 
-    c = ψₐ*ce - χₐ
-    d = 1 + c^2 
+    c = ψₐ * ce - χₐ
+    d = 1 + c^2
 
     # Convert CIP corrections 
-    δΔψ = (δx - c*δy)/se/d
-    δΔϵ = (δy + c*δx)/d
+    δΔψ = (δx - c * δy) / se / d
+    δΔϵ = (δy + c * δx) / d
 
     return δΔψ, δΔϵ
 
